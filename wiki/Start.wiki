@@ -1,0 +1,8 @@
+=Documentation=
+
+  * *Tone Library* - Generate tones on arbitrary pins.
+    * ToneLibraryDocumentation
+  * *Rogue Robotics SD Card module Library*
+    * [http://www.roguerobotics.com/wikidocs/code/library/arduino/roguesd RogueSD Library Documentation]
+  * *Rogue Robotics MP3 Playback module Library*
+    * [http://www.roguerobotics.com/wikidocs/code/library/arduino/roguemp3 RogueMP3 Library Documentation]
