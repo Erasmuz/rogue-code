@@ -1,10 +1,10 @@
-// This example plays notes 'a' through 'g' sent over the Serial Monitor.
-// 's' stops the current playing tone.
+// Duelling Tones - Simultaneous tone generation.
+// To mix the output of the signals to output to a small speaker (i.e. 8 Ohms or higher),
+// simply use 1K Ohm resistors from each output pin and tie them together at the speaker.
+// Don't forget to connect the other side of the speaker to ground!
 
-// NOTE: This ONLY plays on pin 11 on the ATmega168 and ATmega328
-//       (or ONLY on pin 10 on the ATmega1280)
-// PWM will be disabled for pins 3 and 11 ('168, '328)
-// (or pins 9 and 10 on the '1280)
+// This example plays notes 'a' through 'g' sent over the Serial Monitor.
+// 's' stops the current playing tone.  Use uppercase letters for the second.
 
 #include <Tone.h>
 
@@ -16,9 +16,14 @@ int notes[] = { NOTE_A3,
                 NOTE_F4,
                 NOTE_G4 };
 
+Tone np1(11);
+Tone np2(12);
+
 void setup(void)
 {
   Serial.begin(9600);
+  np1.begin();
+  np2.begin();
 }
 
 void loop(void)
@@ -38,20 +43,36 @@ void loop(void)
       case 'e':
       case 'f':
       case 'g':
-        Tone::play(notes[c - 'a']);
+        np1.play(notes[c - 'a']);
         Serial.println(notes[c - 'a']);
         break;
       case 's':
-        Tone::stop();
+        np1.stop();
         break;
+
+      case 'A':
+      case 'B':
+      case 'C':
+      case 'D':
+      case 'E':
+      case 'F':
+      case 'G':
+        np2.play(notes[c - 'A']);
+        Serial.println(notes[c - 'A']);
+        break;
+      case 'S':
+        np2.stop();
+        break;
+
       default:
-        Tone::play(NOTE_D2);
+        np2.stop();
+        np1.play(NOTE_B2);
         delay(300);
-        Tone::stop();
+        np1.stop();
         delay(100);
-        Tone::play(NOTE_D2);
+        np2.play(NOTE_B2);
         delay(300);
-        Tone::stop();
+        np2.stop();
         break;
     }
   }

@@ -1,14 +1,17 @@
 // A fun sketch to demonstrate the use of the Tone library.
-//
+
+// To mix the output of the signals to output to a small speaker (i.e. 8 Ohms or higher),
+// simply use 1K Ohm resistors from each output pin and tie them together at the speaker.
+// Don't forget to connect the other side of the speaker to ground!
+
 // You can get more RTTTL (RingTone Text Transfer Language) songs from
 // http://merwin.bespin.org/db/rts/index.php
-//
-// NOTE: This ONLY plays on pin 11 on the ATmega168 and ATmega328
-//       (or ONLY on pin 10 on the ATmega1280)
-// PWM will be disabled for pins 3 and 11 ('168, '328)
-// (or pins 9 and 10 on the '1280)
 
 #include <Tone.h>
+
+Tone tone1(13);
+
+#define OCTAVE_OFFSET 0
 
 int notes[] = { 0,
 NOTE_C4, NOTE_CS4, NOTE_D4, NOTE_DS4, NOTE_E4, NOTE_F4, NOTE_FS4, NOTE_G4, NOTE_GS4, NOTE_A4, NOTE_AS4, NOTE_B4,
@@ -37,12 +40,12 @@ NOTE_C7, NOTE_CS7, NOTE_D7, NOTE_DS7, NOTE_E7, NOTE_F7, NOTE_FS7, NOTE_G7, NOTE_
 //char *song = "Smurfs:d=32,o=5,b=200:4c#6,16p,4f#6,p,16c#6,p,8d#6,p,8b,p,4g#,16p,4c#6,p,16a#,p,8f#,p,8a#,p,4g#,4p,g#,p,a#,p,b,p,c6,p,4c#6,16p,4f#6,p,16c#6,p,8d#6,p,8b,p,4g#,16p,4c#6,p,16a#,p,8b,p,8f,p,4f#";
 //char *song = "MahnaMahna:d=16,o=6,b=125:c#,c.,b5,8a#.5,8f.,4g#,a#,g.,4d#,8p,c#,c.,b5,8a#.5,8f.,g#.,8a#.,4g,8p,c#,c.,b5,8a#.5,8f.,4g#,f,g.,8d#.,f,g.,8d#.,f,8g,8d#.,f,8g,d#,8c,a#5,8d#.,8d#.,4d#,8d#.";
 //char *song = "LeisureSuit:d=16,o=6,b=56:f.5,f#.5,g.5,g#5,32a#5,f5,g#.5,a#.5,32f5,g#5,32a#5,g#5,8c#.,a#5,32c#,a5,a#.5,c#.,32a5,a#5,32c#,d#,8e,c#.,f.,f.,f.,f.,f,32e,d#,8d,a#.5,e,32f,e,32f,c#,d#.,c#";
-char *song = "MissionImp:d=16,o=6,b=100:32d,32d#,32d,32d#,32d,32d#,32d,32d#,32d,32d,32d#,32e,32f,32f#,32g,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,p,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,p,a#,g,2d,32p,a#,g,2c#,32p,a#,g,2c,a#5,8c";
-
+char *song = "MissionImp:d=16,o=6,b=95:32d,32d#,32d,32d#,32d,32d#,32d,32d#,32d,32d,32d#,32e,32f,32f#,32g,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,p,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,p,a#,g,2d,32p,a#,g,2c#,32p,a#,g,2c,a#5,8c,2p,32p,a#5,g5,2f#,32p,a#5,g5,2f,32p,a#5,g5,2e,d#,8d";
 
 void setup(void)
 {
   Serial.begin(9600);
+  tone1.begin();
 }
 
 #define isdigit(n) (n >= '0' && n <= '9')
@@ -182,7 +185,9 @@ void play_rtttl(char *p)
     {
       scale = default_oct;
     }
-  
+
+    scale += OCTAVE_OFFSET;
+
     if(*p == ',')
       p++;       // skip comma for next note (or we may be at the end)
 
@@ -196,9 +201,9 @@ void play_rtttl(char *p)
       Serial.print(notes[(scale - 4) * 12 + note], 10);
       Serial.print(") ");
       Serial.println(duration, 10);
-      Tone::play(notes[(scale - 4) * 12 + note]);
+      tone1.play(notes[(scale - 4) * 12 + note]);
       delay(duration);
-      Tone::stop();
+      tone1.stop();
     }
     else
     {

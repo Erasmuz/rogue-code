@@ -133,13 +133,19 @@ Version Modified By Date     Comments
 * Definitions
 *************************************************/
 
-namespace Tone
+class Tone
 {
-  extern volatile unsigned long timer2_interrupt_count;
-  extern volatile bool playing;
+  public:
+    Tone(uint8_t tonePin);
+    void begin();
+    bool isPlaying();
+    void play(int frequency, unsigned long duration = 0);
+    void stop();
 
-  void play(int frequency, unsigned long duration = 0);
-  void stop();
-}
+  private:
+    static uint8_t _tone_pin_count;
+    uint8_t _pin;
+    int8_t _timer;
+};
 
 #endif
