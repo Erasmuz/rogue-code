@@ -1,0 +1,145 @@
+' =========================================================================
+'
+'   File....... uMP3_Demo.BS1
+'   Purpose.... uMP3 Demonstration
+'   Author..... Jon Williams (EFX-TEK)
+'   E-mail.....
+'   Started....
+'   Updated.... 07 OCT 2009
+'
+'   {$STAMP BS1}
+'   {$PBASIC 1.0}
+'
+' =========================================================================
+
+
+' -----[ Program Description ]---------------------------------------------
+
+
+' -----[ Revision History ]------------------------------------------------
+
+
+' -----[ I/O Definitions ]-------------------------------------------------
+
+SYMBOL  RX              = 7                     ' to UMP3.T; no ULN
+SYMBOL  TX              = 6                     ' to UMP3.R; no ULN
+SYMBOL  Sio             = 5                     ' no ULN
+SYMBOL  Trigger         = PIN4                  ' keep ULN; is pull-down
+
+
+' -----[ Constants ]-------------------------------------------------------
+
+SYMBOL  Baud            = OT2400
+
+SYMBOL  Yes             = 1
+SYMBOL  No              = 0
+
+
+' -----[ Variables ]-------------------------------------------------------
+
+SYMBOL  timer           = B2
+SYMBOL  mp3             = B3                    ' MP3 file pointer
+SYMBOL  last            = B4
+SYMBOL  eePntr          = B5                    ' EEPROM memory pointer
+SYMBOL  char            = B6                    ' character value
+SYMBOL  idx             = B7
+
+SYMBOL  lottery         = W5                    ' random value
+
+
+' -----[ Initialization ]--------------------------------------------------
+
+Reset:
+  GOSUB UMP3_Stop                               ' stop if playing
+  PAUSE 2000                                    ' let uMP3 start
+
+Prod_uMP3:
+  SEROUT TX, Baud, (13)                         ' send CR
+  SERIN  RX, Baud, char                         ' get response
+  IF char <> ">" THEN Prod_uMP3                 ' wait for ">"
+
+
+' -----[ Program Code ]----------------------------------------------------
+
+Main:
+  timer = 0                                     ' reset timer
+
+Check_Trigger:
+  RANDOM lottery
+  PAUSE 5                                       ' loop pad
+  timer = timer + 5 * Trigger                   ' update timer
+  IF timer < 100 THEN Check_Trigger             ' wait for 0.1 sec input
+
+  mp3 = lottery // 8                            ' make 0 - 7
+  IF mp3 = last THEN Main
+    last = mp3
+
+  DEBUG mp3, CR
+  GOSUB UMP3_Play                               ' play it
+
+Wait_Start:
+  GOSUB UMP3_Status
+  IF char <> "P" THEN Wait_Start
+    DEBUG "  ...playing", CR
+
+Wait_End:
+  GOSUB UMP3_Status
+  IF char = "P" THEN Wait_End
+    DEBUG "  ...done", CR, CR
+
+  PAUSE 2000
+  GOTO Main
+
+
+' -----[ Subroutines ]-----------------------------------------------------
+
+' Put file # to play in "mp3"
+
+UMP3_Play:
+  eePntr = 8 * mp3                              ' convert to pointer
+
+Send_Cmd:
+  SEROUT TX, Baud, ("PC F /")                   ' start play command
+
+Send_Name:                                      ' send file title
+  FOR idx = 1 TO 8                              ' max is 8 characters
+    READ eePntr, char                           ' get a character
+    IF char = 0 THEN Finish_Cmd                 ' if 0, we're at end
+    SEROUT TX, Baud, (char)
+    eePntr = eePntr + 1
+  NEXT
+
+Finish_Cmd:
+  SEROUT TX, Baud, (".MP3", 13)                 ' send extention + CR
+  RETURN
+
+
+' -------------------------------------------------------------------------
+
+UMP3_Stop:
+  SEROUT TX, Baud, ("PC S", 13)
+  RETURN
+
+' -------------------------------------------------------------------------
+
+UMP3_Status:
+  SEROUT TX, Baud, ("PC Z", 13)                 ' request status
+  SERIN  RX, Baud, char                         ' will be "S" or "P"
+  RETURN
+
+
+' -----[ EEPROM Data ]-----------------------------------------------------
+
+' File names are stored on 8-byte boundaries -- this is very important for
+' correct program operation.  This strategy uses a little more EE space but
+' is easier to update and maintain
+
+Song_List:
+  EEPROM $00, ("firefly")                       ' mp3 = 0
+  EEPROM $08, ("serenity")                      ' mp3 = 1
+  EEPROM $10, ("spalding")
+  EEPROM $18, ("thunder1")
+  EEPROM $20, ("thunder2")
+  EEPROM $28, ("thunder3")
+  EEPROM $30, ("explode")
+  EEPROM $38, ("angel")
