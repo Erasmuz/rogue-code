@@ -4,21 +4,66 @@
 
 ----
 
-==Links==
+==Description==
 
-===RTTTL Sites===
+An Arduino Library to produce square-wave tones.
 
-  * http://merwin.bespin.org/db/rts/index.php
-  * http://www.cellringtones.com/
-  * http://nokiatone.ifrance.com/nokiatone/rtttf.htm
-  * http://www.ringtones4all.com/index.php?page=freetone&catr=20&cnt=0
-  * http://ringtones.frostzone.com/
-  * http://www.2thumbswap.com/members/tones/nokia/tones_nokia_main.html
-  * http://hem.passagen.se/klas2/vgtones/
+It uses the hardware timers on the microcontroller to generate square-wave tones in the audible range.
 
-===Tone Library Examples===
+You can output the tones on any pin (arbitrary).  The number of tones that can be played simultaneously depends on the number of hardware timers (with CTC capability) available on the microcontroller.
 
-  * [http://itp.nyu.edu/physcomp/Labs/ToneOutput Tom Igoe - Tone Output using an Arduino]
+ * ATmega8: 2
+ * ATmega168/328: 3
+ * ATmega1280: 6
+
+Check out the great [http://itp.nyu.edu/physcomp/Labs/ToneOutput tutorial] by Tom Igoe at NYU's Interactive Telecommunications Program (ITP).
+
+*Notes:*
+
+Just connect the digital pin to a speaker (with a resistor - say 1K - in line), and the other side of the speaker to ground (GND).
+
+You can use a potentiometer to control the volume.
+
+Using this library will affect usage of the PWM outputs, so be aware.
+
+Also, although it's the last timer to be allocated, timer 0 (which is used for `millis()` among other things) will be affected if used.
+
+You use it as such:
+{{{
+#include <Tone.h>
+
+Tone tone1;
+
+void setup()
+{
+  tone1.begin(13);
+  tone1.play(NOTE_A4);
+}
+
+void loop()
+{
+}
+}}}
+
+The `play()` method can be called in one of two ways:
+
+`tone1.play(`_*`frequency`*_`, `_*`duration`*_`);`
+
+or
+
+`tone1.play(`_*`frequency`*_`);`
+
+The _*`frequency`*_ is in Hertz, and the _*`duration`*_ is in milliseconds.  If you do not specify _*`duration`*_, the tone will play continuously.
+
+`Tone::play()` is non-blocking - this means that it starts the tone, then returns immediately.  Either the tone will stop playing after the duration specified, or will play indefinitely (if no duration provided).
+
+Use the `stop()` method to stop the currently playing tone.
+
+Use the `isPlaying()` method to see if the tone is playing.
+
+Try out the RTTTL (!RingTone Text Transfer Language) example.
+
+*WARNING*: Do not connect the pin directly to some sort of audio input.  The voltage is considerably higher than a standard line-out, and can damage sound card inputs, etc.  You could use a voltage divider to bring the voltage down, but you have been warned.
 
 ----
 
@@ -150,3 +195,21 @@ e.g.
 || NOTE_CS8 || 4435 ||
 || NOTE_D8  || 4699 ||
 || NOTE_DS8 || 4978 ||
+
+----
+
+==Links==
+
+===RTTTL Sites===
+
+  * http://merwin.bespin.org/db/rts/index.php
+  * http://www.cellringtones.com/
+  * http://nokiatone.ifrance.com/nokiatone/rtttf.htm
+  * http://www.ringtones4all.com/index.php?page=freetone&catr=20&cnt=0
+  * http://ringtones.frostzone.com/
+  * http://www.2thumbswap.com/members/tones/nokia/tones_nokia_main.html
+  * http://hem.passagen.se/klas2/vgtones/
+
+===Tone Library Examples===
+
+  * [http://itp.nyu.edu/physcomp/Labs/ToneOutput Tom Igoe - Tone Output using an Arduino]
