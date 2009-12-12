@@ -136,8 +136,7 @@ Version Modified By Date     Comments
 class Tone
 {
   public:
-    Tone(uint8_t tonePin);
-    void begin();
+    void begin(uint8_t tonePin);
     bool isPlaying();
     void play(int frequency, unsigned long duration = 0);
     void stop();

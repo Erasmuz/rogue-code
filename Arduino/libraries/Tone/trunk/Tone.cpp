@@ -101,25 +101,14 @@ const uint8_t PROGMEM tone_pin_to_timer_PGM[] = { 2, 1, 0 };
 uint8_t Tone::_tone_pin_count = 0;
 
 
-Tone::Tone(uint8_t tonePin)
+void Tone::begin(uint8_t tonePin)
 {
   if(_tone_pin_count < AVAILABLE_TONE_PINS)
   {
     _pin = tonePin;
     _timer = pgm_read_byte(tone_pin_to_timer_PGM + _tone_pin_count);
     _tone_pin_count++;
-  }
-  else
-  {
-    // disabled
-    _timer = -1;
-  }
-}
 
-void Tone::begin()
-{
-  if(_timer > 0)
-  {
     // Set timer specific stuff
     // All timers in CTC mode
     // 8 bit timers will require changing presaclar values,
@@ -188,6 +177,11 @@ void Tone::begin()
         break;
 #endif
     }
+  }
+  else
+  {
+    // disabled
+    _timer = -1;
   }
 }
 

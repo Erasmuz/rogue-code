@@ -9,7 +9,7 @@
 
 #include <Tone.h>
 
-Tone tone1(13);
+Tone tone1;
 
 #define OCTAVE_OFFSET 0
 
@@ -45,7 +45,7 @@ char *song = "MissionImp:d=16,o=6,b=95:32d,32d#,32d,32d#,32d,32d#,32d,32d#,32d,3
 void setup(void)
 {
   Serial.begin(9600);
-  tone1.begin();
+  tone1.begin(13);
 }
 
 #define isdigit(n) (n >= '0' && n <= '9')

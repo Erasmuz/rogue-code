@@ -8,8 +8,8 @@
 
 #include <Tone.h>
 
-Tone freq1(11);
-Tone freq2(12);
+Tone freq1;
+Tone freq2;
 
 const int DTMF_freq1[] = { 1336, 1209, 1336, 1477, 1209, 1336, 1477, 1209, 1336, 1477 };
 const int DTMF_freq2[] = {  941,  697,  697,  697,  770,  770,  770,  852,  852,  852 };
@@ -17,8 +17,8 @@ const int DTMF_freq2[] = {  941,  697,  697,  697,  770,  770,  770,  852,  852,
 void setup()
 {
   Serial.begin(9600);
-  freq1.begin();
-  freq2.begin();
+  freq1.begin(11);
+  freq2.begin(12);
 }
 
 void playDTMF(uint8_t number, long duration)

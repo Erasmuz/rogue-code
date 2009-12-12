@@ -16,14 +16,14 @@ int notes[] = { NOTE_A3,
                 NOTE_F4,
                 NOTE_G4 };
 
-Tone np1(11);
-Tone np2(12);
+// You can declare the tones as an array
+Tone notePlayer[2];
 
 void setup(void)
 {
   Serial.begin(9600);
-  np1.begin();
-  np2.begin();
+  notePlayer[0].begin(11);
+  notePlayer[1].begin(12);
 }
 
 void loop(void)
@@ -43,11 +43,11 @@ void loop(void)
       case 'e':
       case 'f':
       case 'g':
-        np1.play(notes[c - 'a']);
+        notePlayer[0].play(notes[c - 'a']);
         Serial.println(notes[c - 'a']);
         break;
       case 's':
-        np1.stop();
+        notePlayer[0].stop();
         break;
 
       case 'A':
@@ -57,22 +57,22 @@ void loop(void)
       case 'E':
       case 'F':
       case 'G':
-        np2.play(notes[c - 'A']);
+        notePlayer[1].play(notes[c - 'A']);
         Serial.println(notes[c - 'A']);
         break;
       case 'S':
-        np2.stop();
+        notePlayer[1].stop();
         break;
 
       default:
-        np2.stop();
-        np1.play(NOTE_B2);
+        notePlayer[1].stop();
+        notePlayer[0].play(NOTE_B2);
         delay(300);
-        np1.stop();
+        notePlayer[0].stop();
         delay(100);
-        np2.play(NOTE_B2);
+        notePlayer[1].play(NOTE_B2);
         delay(300);
-        np2.stop();
+        notePlayer[1].stop();
         break;
     }
   }
