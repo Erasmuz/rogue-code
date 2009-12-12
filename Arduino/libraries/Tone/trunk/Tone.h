@@ -23,6 +23,12 @@
 Version Modified By Date     Comments
 ------- ----------- -------- --------
 0001    B Hagman    09/08/02 Initial coding
+0002    B Hagman    09/08/18 Multiple pins
+0003    B Hagman    09/08/18 Moved initialization from constructor to begin()
+0004    B Hagman    09/09/26 Fixed problems with ATmega8
+0005    B Hagman    09/11/23 Scanned prescalars for best fit on 8 bit timers
+                    09/11/25 Changed pin toggle method to XOR
+                    09/11/25 Fixed timer0 from being excluded
 
 *************************************************/
 
@@ -35,7 +41,6 @@ Version Modified By Date     Comments
 * Public Constants
 *************************************************/
 
-// Lowest for ck/1024
 #define NOTE_B0  31
 #define NOTE_C1  33
 #define NOTE_CS1 35
@@ -60,7 +65,6 @@ Version Modified By Date     Comments
 #define NOTE_GS2 104
 #define NOTE_A2  110
 #define NOTE_AS2 117
-// Lowest for ck/256
 #define NOTE_B2  123
 #define NOTE_C3  131
 #define NOTE_CS3 139
@@ -73,7 +77,6 @@ Version Modified By Date     Comments
 #define NOTE_GS3 208
 #define NOTE_A3  220
 #define NOTE_AS3 233
-// Lowest for ck/128
 #define NOTE_B3  247
 #define NOTE_C4  262
 #define NOTE_CS4 277
@@ -138,7 +141,7 @@ class Tone
   public:
     void begin(uint8_t tonePin);
     bool isPlaying();
-    void play(int frequency, unsigned long duration = 0);
+    void play(unsigned int frequency, unsigned long duration = 0);
     void stop();
 
   private:

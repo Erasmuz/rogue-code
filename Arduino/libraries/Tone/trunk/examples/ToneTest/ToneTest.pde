@@ -36,13 +36,7 @@ void loop(void)
     
     switch(c)
     {
-      case 'a':
-      case 'b':
-      case 'c':
-      case 'd':
-      case 'e':
-      case 'f':
-      case 'g':
+      case 'a'...'g':
         notePlayer[0].play(notes[c - 'a']);
         Serial.println(notes[c - 'a']);
         break;
@@ -50,13 +44,7 @@ void loop(void)
         notePlayer[0].stop();
         break;
 
-      case 'A':
-      case 'B':
-      case 'C':
-      case 'D':
-      case 'E':
-      case 'F':
-      case 'G':
+      case 'A'...'G':
         notePlayer[1].play(notes[c - 'A']);
         Serial.println(notes[c - 'A']);
         break;
