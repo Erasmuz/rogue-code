@@ -1,8 +1,30 @@
 #summary Arduino Tone Generator Library.
 
-= Arduino Tone Library Usage =
+=Arduino Tone Library=
 
-== Instantiation ==
+----
+
+==Links==
+
+===RTTTL Sites===
+
+  * http://merwin.bespin.org/db/rts/index.php
+  * http://www.cellringtones.com/
+  * http://nokiatone.ifrance.com/nokiatone/rtttf.htm
+  * http://www.ringtones4all.com/index.php?page=freetone&catr=20&cnt=0
+  * http://ringtones.frostzone.com/
+  * http://www.2thumbswap.com/members/tones/nokia/tones_nokia_main.html
+  * http://hem.passagen.se/klas2/vgtones/
+
+===Tone Library Examples===
+
+  * [http://itp.nyu.edu/physcomp/Labs/ToneOutput Tom Igoe - Tone Output using an Arduino]
+
+----
+
+==Library Usage==
+
+===Instantiation===
 
 {{{
 
@@ -16,16 +38,16 @@ void setup(void)
 }}}
 
 
-== Properties ==
+===Properties===
  * No properties.
 
-== Methods ==
+===Methods===
  * <tt>[CommandBegin begin]()</tt> - prepares a pin for playing a tone.
  * <tt>[CommandIsPlaying isPlaying]()</tt> - returns <tt>true</tt> if tone is playing, <tt>false</tt> if not.
  * <tt>[CommandPlay play]()</tt> - play a tone.
  * <tt>[CommandStop stop]()</tt> - stop playing a tone.
 
-== Constants ==
+===Constants===
 
 Below is a list of constant values of frequencies for notes.
 
@@ -35,7 +57,7 @@ e.g.
   notePlayer.play(NOTE_B3);
 }}}
 
-=== Musical Notes ===
+====Musical Notes====
 || *Constant Name* || *Frequency (Hz)* ||
 <wiki:comment>
 || NOTE_B0  || 31 ||
