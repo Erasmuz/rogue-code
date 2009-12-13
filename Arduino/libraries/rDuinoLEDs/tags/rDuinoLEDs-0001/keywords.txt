@@ -1,0 +1,17 @@
+#######################################
+# Syntax Coloring Map for rDuinoLEDs
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+rDuinoLEDs	KEYWORD1
+LEDS  KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+set	KEYWORD2
+toggle	KEYWORD2
