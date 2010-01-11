@@ -13,7 +13,7 @@ Stable Since: *12/12/2005*
 
 Beta Firmware Version: *102.08-b004*
 
-Next Code Freeze Expected: *01/15/2009*
+Next Code Freeze Expected: *01/15/2010*
 
 = Documentation =
 
