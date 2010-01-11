@@ -1,0 +1,22 @@
+#summary uMP3 Firmware Status
+#labels Phase-Implementation
+
+= uMP3 Firmware Status =
+
+== Stable Firmware ==
+
+Stable Firmware Version: *110.12*
+
+Stable Since: *02/10/2006*
+
+== Beta Firmware ==
+
+Beta Firmware Version: *111.08-b002*
+
+Next Code Freeze Expected: *01/15/2010*
+
+= Documentation =
+
+Rogue Robotics *uMMC Serial Data Module* documentation can be found here:
+
+http://www.roguerobotics.com/wikidocs/ummc/documentation/
