@@ -19,4 +19,4 @@ Next Code Freeze Expected: *01/15/2010*
 
 Rogue Robotics *uMMC Serial Data Module* documentation can be found here:
 
-http://www.roguerobotics.com/wikidocs/ummc/documentation/
+http://www.roguerobotics.com/wikidocs/ump3/documentation/
