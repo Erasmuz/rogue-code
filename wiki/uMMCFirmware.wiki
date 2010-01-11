@@ -1,0 +1,22 @@
+#summary uMMC Firmware Status
+#labels Phase-Implementation
+
+= uMMC Firmware Status =
+
+== Stable Firmware ==
+
+Stable Firmware Version: *101.56*
+
+Stable Since: *12/12/2005*
+
+== Beta Firmware ==
+
+Beta Firmware Version: *102.08-b004*
+
+Next Code Freeze Expected: *01/15/2009*
+
+= Documentation =
+
+Rogue Robotics *uMMC Serial Data Module* documentation can be found here:
+
+http://www.roguerobotics.com/wikidocs/ummc/documentation/
