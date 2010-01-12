@@ -5,6 +5,14 @@
 
 <font color="red">*uMP3 Playback Module Firmware is NOT open-source*</font>
 
+== Download ==
+
+http://code.google.com/p/rogue-code/downloads/list?can=2&q=label%3AProject-uMP3Firmware
+
+== Issues ==
+
+http://code.google.com/p/rogue-code/issues/list?can=2&q=label%3AProject-uMP3Firmware
+
 == Stable Firmware ==
 
 || Stable Firmware Version: || *110.12* ||
