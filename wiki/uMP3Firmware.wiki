@@ -3,17 +3,17 @@
 
 = uMP3 Firmware Status =
 
+<font color="red">*uMP3 Playback Module Firmware is NOT open-source*</font>
+
 == Stable Firmware ==
 
-Stable Firmware Version: *110.12*
-
-Stable Since: *02/10/2006*
+|| Stable Firmware Version: || *110.12* ||
+|| Stable Since: || *02/10/2006* ||
 
 == Beta Firmware ==
 
-Beta Firmware Version: *111.08-b002*
-
-Next Code Freeze Expected: *01/15/2010*
+|| Beta Firmware Version: || *111.08-b002* ||
+|| Next Code Freeze Expected: || *01/15/2010* ||
 
 = Documentation =
 
