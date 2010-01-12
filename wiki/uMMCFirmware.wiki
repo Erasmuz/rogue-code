@@ -3,17 +3,18 @@
 
 = uMMC Firmware Status =
 
+<font color="red">*uMMC Serial Data Module Firmware is NOT open-source*</font>
+
 == Stable Firmware ==
 
-Stable Firmware Version: *101.56*
-
-Stable Since: *12/12/2005*
+|| Stable Firmware Version: || *101.56* ||
+|| Stable Since: || *12/12/2005* ||
 
 == Beta Firmware ==
 
-Beta Firmware Version: *102.08-b004*
+|| Beta Firmware Version: || *102.08-b004* ||
+|| Next Code Freeze Expected: || *01/15/2010* ||
 
-Next Code Freeze Expected: *01/15/2010*
 
 = Documentation =
 
