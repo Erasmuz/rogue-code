@@ -1,0 +1,19 @@
+rduino.name=rDuino LEDHead @ 16 MHz
+
+rduino.upload.protocol=stk500
+rduino.upload.maximum_size=63488
+rduino.upload.speed=57600
+
+rduino.bootloader.low_fuses=0xFF
+rduino.bootloader.high_fuses=0xDC
+rduino.bootloader.extended_fuses=0xFD
+rduino.bootloader.path=LEDHead
+rduino.bootloader.file=rDuinoLEDHeadBoot.hex
+rduino.bootloader.unlock_bits=0x3F
+rduino.bootloader.lock_bits=0x0F
+
+rduino.build.mcu=atmega644p
+rduino.build.f_cpu=16000000L
+rduino.build.core=LEDHead
+
+######
