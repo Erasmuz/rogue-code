@@ -4,6 +4,10 @@
 
 ----
 
+==Download==
+
+* [http://rogue-code.googlecode.com/files/Arduino-Library-Tone.zip Tone Library - Latest Version]
+
 ==Description==
 
 An Arduino Library to produce square-wave tones.
