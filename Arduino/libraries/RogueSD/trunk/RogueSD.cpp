@@ -34,6 +34,7 @@
 Version Modified By Date     Comments
 ------- ----------- -------- --------
 0001    B Hagman    09/06/21 Initial coding
+0002    B Hagman    09/12/18 Fixed filecount()
 
 *************************************************/
 
@@ -408,12 +409,6 @@ int8_t RogueSD::opendir(const char *dirname)
 
 int32_t RogueSD::filecount(const char *filemask)
 {
-  return filecount(NULL, filemask);
-}
-
-
-int32_t RogueSD::filecount(const char *dirname, const char *filemask)
-{
   int32_t fcount = 0;
 
   if ((_moduletype == uMMC && _fwversion < UMMC_MIN_FW_VERSION_FOR_NEW_COMMANDS) ||
@@ -425,16 +420,6 @@ int32_t RogueSD::filecount(const char *dirname, const char *filemask)
   }
   else
   {
-    // new
-    if (dirname)
-    {
-      if (opendir(dirname))
-      {
-        // opendir error
-        return -1;
-      }
-    }
-
     if (_moduletype != uMMC) { print("FC"); };
     print("LC "); print(filemask); print('\r');
 

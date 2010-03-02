@@ -34,6 +34,7 @@
 Version Modified By Date     Comments
 ------- ----------- -------- --------
 0001    B Hagman    09/06/21 Initial coding
+0002    B Hagman    09/12/18 Fixed filecount()
 
 *************************************************/
 
@@ -129,7 +130,6 @@ class RogueSD : public Print
 
     int8_t opendir(const char *dirname);
     int32_t filecount(const char *filemask);
-    int32_t filecount(const char *dirname, const char *filemask);
     int8_t readdir(char *filename, const char *filemask);
 
     // delete/remove a file/directory (directory must be empty)
