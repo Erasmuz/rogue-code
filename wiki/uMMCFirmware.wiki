@@ -15,13 +15,13 @@ http://code.google.com/p/rogue-code/issues/list?can=2&q=label%3AProject-uMMCFirm
 
 == Stable Firmware ==
 
-|| Stable Firmware Version: || *101.56* ||
-|| Stable Since: || *12/12/2005* ||
+|| Stable Firmware Version: || *102.08* ||
+|| Stable Since: || *2010/01/15* ||
 
 == Beta Firmware ==
 
-|| Beta Firmware Version: || *102.08-b004* ||
-|| Next Code Freeze Expected: || *01/15/2010* ||
+|| Beta Firmware Version: || *102.09-b001* ||
+|| Next Code Freeze Expected: || *TBD* ||
 
 
 = Documentation =
