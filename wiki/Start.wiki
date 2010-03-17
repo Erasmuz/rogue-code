@@ -1,7 +1,7 @@
 =Documentation=
 
   * *SoftPWM Library* - Up to 16 PWM channels on arbitrary pins.
-    * SoftPWMLibraryDocumentation
+    * [SoftPWMLibraryDocumentation]
   * *Tone Library* - Generate tones on arbitrary pins.
     * ToneLibraryDocumentation
 
