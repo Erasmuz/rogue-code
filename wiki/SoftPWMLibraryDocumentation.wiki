@@ -12,6 +12,10 @@
 
 * [http://rogue-code.googlecode.com/files/Arduino-Library-SoftPWM.zip SoftPWM Library - Latest Version]
 
+==Installation==
+
+See: InstallingArduinoLibraries
+
 ==Description==
 
 An Arduino Library to produce PWM signals on any arbitrary pin.
