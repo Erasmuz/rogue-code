@@ -15,13 +15,13 @@ http://code.google.com/p/rogue-code/issues/list?can=2&q=label%3AProject-uMP3Firm
 
 == Stable Firmware ==
 
-|| Stable Firmware Version: || *110.12* ||
-|| Stable Since: || *02/10/2006* ||
+|| Stable Firmware Version: || *111.08* ||
+|| Stable Since: || *2010/01/15* ||
 
 == Beta Firmware ==
 
-|| Beta Firmware Version: || *111.08-b002* ||
-|| Next Code Freeze Expected: || *01/15/2010* ||
+|| Beta Firmware Version: || *111.09-b001* ||
+|| Next Code Freeze Expected: || *TBD* ||
 
 = Documentation =
 
