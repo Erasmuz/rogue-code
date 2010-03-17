@@ -4,6 +4,10 @@
 
 ----
 
+<wiki:toc max_depth="2" />
+
+----
+
 ==Download==
 
 * [http://rogue-code.googlecode.com/files/Arduino-Library-Tone.zip Tone Library - Latest Version]
@@ -19,6 +23,8 @@ You can output the tones on any pin (arbitrary).  The number of tones that can b
  * ATmega8: 2
  * ATmega168/328: 3
  * ATmega1280: 6
+
+A simplified version of the Tone library has been incorporated into the Arduino core since 0018.  It only provides a single tone (since only one timer is used).  You can find the core documentation [http://arduino.cc/en/Reference/Tone here].
 
 Check out the great [http://itp.nyu.edu/physcomp/Labs/ToneOutput tutorial] by Tom Igoe at NYU's Interactive Telecommunications Program (ITP).
 
@@ -91,7 +97,7 @@ void setup(void)
  * No properties.
 
 ===Methods===
- * <tt>[CommandBegin begin]()</tt> - prepares a pin for playing a tone.
+ * `begin()` - prepares a pin for playing a tone.
  * <tt>[CommandIsPlaying isPlaying]()</tt> - returns <tt>true</tt> if tone is playing, <tt>false</tt> if not.
  * <tt>[CommandPlay play]()</tt> - play a tone.
  * <tt>[CommandStop stop]()</tt> - stop playing a tone.
@@ -217,3 +223,7 @@ e.g.
 ===Tone Library Examples===
 
   * [http://itp.nyu.edu/physcomp/Labs/ToneOutput Tom Igoe - Tone Output using an Arduino]
+
+===Other===
+
+  * [http://www.adrianfreed.com/content/arduino-sketch-high-frequency-precision-sine-wave-tone-sound-synthesis Arduino sketch for high frequency precision sine wave tone sound synthesis]
