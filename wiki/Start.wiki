@@ -1,7 +1,10 @@
 =Documentation=
 
+  * *SoftPWM Library* - Up to 16 PWM channels on arbitrary pins.
+    * SoftPWMLibraryDocumentation
   * *Tone Library* - Generate tones on arbitrary pins.
     * ToneLibraryDocumentation
+
   * *Rogue Robotics SD Card Module Library*
     * [http://www.roguerobotics.com/wikidocs/code/library/arduino/roguesd RogueSD Library Documentation]
   * *Rogue Robotics MP3 Playback Module Library*
