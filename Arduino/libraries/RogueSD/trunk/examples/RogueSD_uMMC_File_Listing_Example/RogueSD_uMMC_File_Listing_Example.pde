@@ -43,7 +43,9 @@ void loop()
     // filecount() takes 2 arguments:
     // 1. source path
     // 2. file mask (e.g. list only MP3 files: "*.mp3")
-    Serial.println(ummc.filecount("/", "*"), DEC);
+    // (note: the "/""*" is there because of a problem with the Arduino IDE
+    // thinking that /* is the start of a comment
+    Serial.println(ummc.filecount("/""*"), DEC);
 
     Serial.println("--- Files ---");
 
