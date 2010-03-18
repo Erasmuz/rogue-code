@@ -7,8 +7,8 @@
 #######################################
 
 RogueSD	KEYWORD1
-fileinfo  KEYWORD1
-moduletype  KEYWORD1
+fileinfo	KEYWORD1
+moduletype	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
