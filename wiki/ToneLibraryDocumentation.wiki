@@ -228,6 +228,10 @@ e.g.
 
   * [http://itp.nyu.edu/physcomp/Labs/ToneOutput Tom Igoe - Tone Output using an Arduino]
 
+===Projects Using Tone Library and core tone===
+
+  * [http://www.jeremycouillard.com/blog/03172010/ Interactive painting]
+
 ===Other===
 
   * [http://www.adrianfreed.com/content/arduino-sketch-high-frequency-precision-sine-wave-tone-sound-synthesis Arduino sketch for high frequency precision sine wave tone sound synthesis]
