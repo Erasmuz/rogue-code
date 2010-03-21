@@ -1,0 +1,8 @@
+$Id$
+
+SoftPWM Library
+
+Version Modified By Date     Comments
+------- ----------- -------- --------
+0001    B Hagman    10/03/14 Initial coding (Pi Day!)
+0002    B Hagman    10/03/21 License updates, minor fixes
