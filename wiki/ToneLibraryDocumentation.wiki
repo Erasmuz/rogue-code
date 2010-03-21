@@ -101,10 +101,12 @@ void setup(void)
  * No properties.
 
 ===Methods===
- * `begin()` - prepares a pin for playing a tone.
- * <tt>[CommandIsPlaying isPlaying]()</tt> - returns <tt>true</tt> if tone is playing, <tt>false</tt> if not.
- * <tt>[CommandPlay play]()</tt> - play a tone.
- * <tt>[CommandStop stop]()</tt> - stop playing a tone.
+ * `begin(`_*`pin`*_`)` - prepares a pin for playing a tone.
+ * `isPlaying()` - returns `true` if tone is playing, `false` if not.
+ * `play(`_*`frequency`*_` [, `_*`duration`*_`])` - play a tone.
+   * _*`duration`*_ is optional.  If _*`duration`*_ is not given, tone will play continuously until _*`stop()`*_ is called.
+   * `play()` is [http://en.wikipedia.org/wiki/Non-blocking_synchronization non-blocking].  Once called, `play()` will return immediately. If _*`duration`*_ is given, the tone will play for that amount of time, and then stop automatically.
+ * `stop()` - stop playing a tone.
 
 ===Constants===
 
