@@ -34,13 +34,15 @@ Check out the great [http://itp.nyu.edu/physcomp/Labs/ToneOutput tutorial] by To
 
 *Notes:*
 
-Just connect the digital pin to a speaker (with a resistor - say 1K - in line), and the other side of the speaker to ground (GND).
+  * Just connect the digital pin to a speaker (with a resistor - say 1K - in line), and the other side of the speaker to ground (GND).
 
-You can use a potentiometer to control the volume.
+[http://arduino.cc/en/uploads/Tutorial/speaker_schem.png]
 
-Using this library will affect usage of the PWM outputs, so be aware.
+  * You can use a potentiometer to control the volume.
 
-Also, although it's the last timer to be allocated, timer 0 (which is used for `millis()` among other things) will be affected if used.
+  * Using this library will affect usage of the PWM outputs, so be aware.
+
+  * Also, although it's the last timer to be allocated, timer 0 (which is used for `millis()` among other things) will be affected if used.
 
 You use it as such:
 {{{
