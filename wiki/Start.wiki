@@ -1,5 +1,7 @@
 =Documentation=
 
+==Arduino Libraries==
+
   * *SoftPWM Library* - Up to 16 PWM channels on arbitrary pins.
     * [SoftPWMLibraryDocumentation]
   * *Tone Library* - Generate tones on arbitrary pins.
