@@ -1,126 +1,97 @@
 #summary Arduino Tone Generator Library.
 
-=Arduino Tone Library=
+= Arduino Tone Library =
 
 ----
 
-<wiki:toc max_depth="2" />
+<wiki:toc max_depth="3" />
 
 ----
 
-==Download==
+== Description ==
 
-* [http://rogue-code.googlecode.com/files/Arduino-Library-Tone.zip Tone Library - Latest Version]
+This is an Arduino Library to produce square-wave of the specified frequency (and 50% duty cycle) on any Arduino pin.
 
-==Installation==
+A duration can optionally be specified, otherwise the wave continues until `stop()` is called.
 
-See: InstallingArduinoLibraries
+The pin can be connected to a piezo buzzer or other speaker to play tones. 
 
-==Description==
+Be sure to try out the RTTTL (!RingTone Text Transfer Language) example!
 
-An Arduino Library to produce square-wave tones.
-
-It uses the hardware timers on the microcontroller to generate square-wave tones in the audible range.
-
-You can output the tones on any pin (arbitrary).  The number of tones that can be played simultaneously depends on the number of hardware timers (with CTC capability) available on the microcontroller.
-
- * ATmega8: 2
- * ATmega168/328: 3
- * ATmega1280: 6
+=== Arduino Core Version ===
 
 A simplified version of the Tone library has been incorporated into the Arduino core since 0018.  It only provides a single tone (since only one timer is used).  You can find the core documentation [http://arduino.cc/en/Reference/Tone here].
 
-Check out the great [http://itp.nyu.edu/physcomp/Labs/ToneOutput tutorial] by Tom Igoe at NYU's Interactive Telecommunications Program (ITP).
+Check out the great [http://itp.nyu.edu/physcomp/Labs/ToneOutput tutorial] by Tom Igoe at NYU's Interactive Telecommunications Program (ITP).  It demonstrates how to use the core `tone()` and `noTone()` commands.
 
-*Notes:*
+=== _WARNING_ ===
+*_Do not connect the pin directly to some sort of audio input.  The voltage is considerably higher than a standard [http://en.wikipedia.org/wiki/Line_level line level voltages], and can damage sound card inputs, etc.  You could use a voltage divider to bring the voltage down, but you have been warned._*
 
-  * Just connect the digital pin to a speaker (with a resistor - say 1K - in line), and the other side of the speaker to ground (GND).
+----
+
+== Download and Installation ==
+
+* [http://rogue-code.googlecode.com/files/Arduino-Library-Tone.zip Tone Library - Latest Version]
+
+For installing the library, see: InstallingArduinoLibraries
+
+----
+
+== Hardware Connections/Requirements ==
+
+  * Just connect the digital pin to a speaker (with a resistor - say 1K - in line), and the other side of the speaker to ground (GND).  Tom Igoe's example:
 
 [http://arduino.cc/en/uploads/Tutorial/speaker_schem.png]
 
-  * You can use a potentiometer to control the volume.
+  * You can use a potentiometer to control the volume.  Use a 10K Ohm potentiometer (variable resistor) in line with the 1K Ohm resistor connected to the speaker.
 
   * Using this library will affect usage of the PWM outputs, so be aware.
 
   * Also, although it's the last timer to be allocated, timer 0 (which is used for `millis()` among other things) will be affected if used.
 
-You use it as such:
-{{{
-#include <Tone.h>
-
-Tone tone1;
-
-void setup()
-{
-  tone1.begin(13);
-  tone1.play(NOTE_A4);
-}
-
-void loop()
-{
-}
-}}}
-
-The `play()` method can be called in one of two ways:
-
-`tone1.play(`_*`frequency`*_`, `_*`duration`*_`);`
-
-or
-
-`tone1.play(`_*`frequency`*_`);`
-
-The _*`frequency`*_ is in Hertz, and the _*`duration`*_ is in milliseconds.  If you do not specify _*`duration`*_, the tone will play continuously.
-
-`Tone::play()` is non-blocking - this means that it starts the tone, then returns immediately.  Either the tone will stop playing after the duration specified, or will play indefinitely (if no duration provided).
-
-Use the `stop()` method to stop the currently playing tone.
-
-Use the `isPlaying()` method to see if the tone is playing.
-
-Try out the RTTTL (!RingTone Text Transfer Language) example.
-
-*WARNING*: Do not connect the pin directly to some sort of audio input.  The voltage is considerably higher than a standard line-out, and can damage sound card inputs, etc.  You could use a voltage divider to bring the voltage down, but you have been warned.
-
 ----
 
 ==Library Usage==
 
-===Instantiation===
+=== Instantiation/Creation ===
 
 {{{
 
-Tone notePlayer;
+Tone tone1;
 
 void setup(void)
 {
-  notePlayer.begin(13);
+  tone1.begin(13);
 }
 
 }}}
 
 
-===Properties===
+=== Properties ===
  * No properties.
 
-===Methods===
+=== Methods ===
  * `begin(`_*`pin`*_`)` - prepares a pin for playing a tone.
+   * 
  * `isPlaying()` - returns `true` if tone is playing, `false` if not.
  * `play(`_*`frequency`*_` [, `_*`duration`*_`])` - play a tone.
+   * _*`frequency`*_ is in Hertz, and the _*`duration`*_ is in milliseconds.
    * _*`duration`*_ is optional.  If _*`duration`*_ is not given, tone will play continuously until _*`stop()`*_ is called.
    * `play()` is [http://en.wikipedia.org/wiki/Non-blocking_synchronization non-blocking].  Once called, `play()` will return immediately. If _*`duration`*_ is given, the tone will play for that amount of time, and then stop automatically.
  * `stop()` - stop playing a tone.
 
-===Constants===
+=== Constants ===
 
-Below is a list of constant values of frequencies for notes.
+Below is a list of constant values of frequencies for notes.  (These are included in the library).
 
 e.g.
 
 {{{
-  notePlayer.play(NOTE_B3);
+  tone1.play(NOTE_B3);
 }}}
 
-====Musical Notes====
+==== Musical Notes ====
+
 || *Constant Name* || *Frequency (Hz)* ||
 <wiki:comment>
 || NOTE_B0  || 31 ||
@@ -214,11 +185,62 @@ e.g.
 || NOTE_D8  || 4699 ||
 || NOTE_DS8 || 4978 ||
 
+
+=== Quick example ===
+
+Play a 440 Hz - musical note of 4^th^ octave A - on pin 13:
+{{{
+#include <Tone.h>
+
+Tone tone1;
+
+void setup()
+{
+  tone1.begin(13);
+  tone1.play(NOTE_A4);
+}
+
+void loop()
+{
+}
+}}}
+
 ----
 
-==Links==
+== Ugly Details ==
 
-===RTTTL Sites===
+The library uses the hardware timers on the microcontroller to generate square-wave tones in the audible range.
+
+You can output the tones on any pin (arbitrary).  The number of tones that can be played simultaneously depends on the number of hardware timers (with CTC capability) available on the microcontroller.
+
+ * ATmega8: 2 (timers 2, and 1)
+ * ATmega168/328: 3 (timers 2, 1, and 0)
+ * ATmega1280: 6 (timers 2, 3, 4, 5, 1, 0)
+
+The timer order given above is the order in which the timers are allocated.  Timer 0 is a sensitive timer on the Arduino since it provides `millis()` and PWM functionality.
+
+The range of frequencies that can be produced depends on the microcontroller clock frequency and the timer which is being used:
+
+||*MCU clock*||*8 bit timer F,,low,,*||*16 bit timer F,,low,,*||*F,,high,,*||
+||8 MHz      ||16 Hz                 ||1 Hz (1/16 Hz)         ||4 MHz      ||
+||16 MHz     ||31 Hz                 ||1 Hz (1/8 Hz)          ||8 MHz      ||
+
+Although F,,high,, can go as high as 8 MHz, the [http://en.wikipedia.org/wiki/Hearing_range#Humans human hearing range] is typically as high as 20 kHz.
+
+Tone accuracy is dependent on the timer prescalar.  Frequency quantization occurs as the frequencies increase per prescalar.
+
+If you used a 16 bit timer (e.g. timer 1, or timers 3,4,5 on '1280), you could generate "tones" down to 1/8 Hz (one cycle every 8 seconds), although the library only accept integers for frequency.
+
+----
+
+== Links ==
+
+=== Projects/Examples Using Tone Library and Core `tone()` ===
+
+  * [http://itp.nyu.edu/physcomp/Labs/ToneOutput Tom Igoe - Tone Output using an Arduino]
+  * [http://www.jeremycouillard.com/blog/03172010/ Interactive painting]
+
+=== RTTTL Sites ===
 
   * http://merwin.bespin.org/db/rts/index.php
   * http://www.cellringtones.com/
@@ -229,14 +251,6 @@ e.g.
   * http://hem.passagen.se/klas2/vgtones/
   * http://arcadetones.emuunlim.com/
 
-===Tone Library Examples===
-
-  * [http://itp.nyu.edu/physcomp/Labs/ToneOutput Tom Igoe - Tone Output using an Arduino]
-
-===Projects Using Tone Library and core tone===
-
-  * [http://www.jeremycouillard.com/blog/03172010/ Interactive painting]
-
-===Other===
+=== Other ===
 
   * [http://www.adrianfreed.com/content/arduino-sketch-high-frequency-precision-sine-wave-tone-sound-synthesis Arduino sketch for high frequency precision sine wave tone sound synthesis]
