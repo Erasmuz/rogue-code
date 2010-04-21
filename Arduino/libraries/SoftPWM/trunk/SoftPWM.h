@@ -29,7 +29,7 @@
 #define ALL -1
 
 void SoftPWMBegin(void);
-void SoftPWMSet(int8_t pin, uint8_t value);
-void SoftPWMSetPercent(int8_t pin, uint8_t percent);
+void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset = 0);
+void SoftPWMSetPercent(int8_t pin, uint8_t percent, uint8_t hardset = 0);
 void SoftPWMEnd(int8_t pin);
 void SoftPWMSetFadeTime(int8_t pin, uint16_t fadeUpTime, uint16_t fadeDownTime);

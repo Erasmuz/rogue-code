@@ -27,8 +27,15 @@
 #include <wiring.h>
 #include <pins_arduino.h>
 
-#define SOFTPWM_OCR 128
-#define SOFTPWM_CK_DIVISOR 8
+#if F_CPU
+#define SOFTPWM_FREQ 60UL
+#define SOFTPWM_OCR (F_CPU/(8UL*256UL*SOFTPWM_FREQ))
+#else
+// 130 == 60 Hz (on 16 MHz part)
+#define SOFTPWM_OCR 130
+#endif
+
+volatile uint8_t _isr_softcount = 0xff;
 
 typedef struct
 {
@@ -49,7 +56,6 @@ softPWMChannel _softpwm_channels[SOFTPWM_MAXCHANNELS];
 // Here is the meat and gravy
 ISR(TIMER2_COMPA_vect)
 {
-  static uint8_t _isr_softcount=0xff;
   uint8_t i;
   int16_t newvalue;
   int16_t direction;
@@ -112,13 +118,13 @@ void SoftPWMBegin(void)
   // At these settings on a 16 MHz part, we will get a PWM period of
   // approximately 60Hz (~16ms).
 
-    uint8_t i;
+  uint8_t i;
   
   TIFR2 = (1 << TOV2);          // clear interrupt flag
-  TIMSK2 = (1 << OCIE2A);       // enable timer0 output compare match interrupt
   TCCR2B = (1 << CS21);         // start timer (ck/8 prescalar)
   TCCR2A = (1 << WGM21);        // CTC mode
   OCR2A = SOFTPWM_OCR;          // We want to have at least 30Hz or else it gets choppy
+  TIMSK2 = (1 << OCIE2A);       // enable timer2 output compare match interrupt
 
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
   {
@@ -129,16 +135,22 @@ void SoftPWMBegin(void)
 }
 
 
-void SoftPWMSetPercent(int8_t pin, uint8_t percent)
+void SoftPWMSetPercent(int8_t pin, uint8_t percent, uint8_t hardset)
 {
-  SoftPWMSet(pin, ((uint16_t)percent * 255) / 100);
+  SoftPWMSet(pin, ((uint16_t)percent * 255) / 100, hardset);
 }
 
 
-void SoftPWMSet(int8_t pin, uint8_t value)
+void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset)
 {
   int8_t firstfree = -1;  // first free index
   uint8_t i;
+
+  if (hardset)
+  {
+    TCNT2 = 0;
+    _isr_softcount = 0xff;
+  }
 
   // If the pin isn't already set, add it
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
