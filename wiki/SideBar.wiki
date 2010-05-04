@@ -6,7 +6,7 @@
     * [SoftPWMLibraryDocumentation SoftPWM Library]
     * [http://www.roguerobotics.com/wikidocs/code/library/arduino/roguesd RogueSD Library]
     * [http://www.roguerobotics.com/wikidocs/code/library/arduino/roguemp3 RogueMP3 Library]
-
+  * [http://code.google.com/p/rogue-code/downloads/list Downloads]
 
 ----
 
