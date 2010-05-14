@@ -1,0 +1,8 @@
+$Id$
+
+RogueMP3 Library
+
+Version Modified By Date     Comments
+------- ----------- -------- --------
+0001    B Hagman    09/07/05 Initial coding
+0002    B Hagman    10/03/21 License updates, minor fixes
