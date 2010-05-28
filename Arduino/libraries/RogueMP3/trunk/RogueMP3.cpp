@@ -405,6 +405,58 @@ void RogueMP3::print_P(const prog_char *str)
 }
 
 
+
+uint8_t RogueMP3::getspectrumanalyzer(uint8_t values[], uint8_t peaks)
+{
+  uint8_t count = 0;
+  uint8_t value = 0;
+  uint8_t ch;
+  
+  print_P(PSTR("PCY"));
+  if (peaks)
+    print('P');
+  print('\r');
+
+  // now get the info we need
+
+  ch = _read_blocked();  // start it off (ch should be a space)
+  
+  while (ch == ' ')
+  {
+    value = _getnumber(10);
+    values[count++] = value;
+    ch = _read_blocked();
+  }
+  
+  return count;
+}
+
+void RogueMP3::setspectrumanalyzer(uint16_t bands[], uint8_t count)
+{
+  uint8_t i;
+  
+  if (count == 0)
+    return;
+
+  if (count > 23)
+    count = 23;
+  
+  print_P(PSTR("PCYS"));
+
+  // now send the band frequencies
+
+  for (i = 0; i < count; i++)
+  {
+    print(' ');
+    print(bands[i], DEC);
+  }
+  
+  print('\r');
+  
+  _read_blocked();                      // consume prompt
+}
+
+
 /*************************************************
 * Public (virtual)
 *************************************************/

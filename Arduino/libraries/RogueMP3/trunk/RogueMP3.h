@@ -142,6 +142,8 @@ class RogueMP3 : public Print
     
     playbackinfo getplaybackinfo(void);
     char getplaybackstatus(void);
+    uint8_t getspectrumanalyzer(uint8_t values[], uint8_t peaks=0);
+    void setspectrumanalyzer(uint16_t bands[], uint8_t count);
 
     // Settings ("ST") methods
     int8_t changesetting(char setting, const char *value);
