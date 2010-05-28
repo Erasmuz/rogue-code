@@ -57,8 +57,13 @@ void loop()
     // 1. char buffer to store the name - make sure that it's big enough to store the
     //    largest name in the directory.
     // 2. file mask (same as in filecount())
-    while(ummc.readdir(filename, "*") == 0)
+    
+    int type;
+    
+    while((type = ummc.readdir(filename, "*")) >= 0)
     {
+      if (type == 1)  // if it's a folder/directory
+        Serial.print("*DIR* ");
       Serial.println(filename);
     }
 

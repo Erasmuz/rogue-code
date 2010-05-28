@@ -1,4 +1,4 @@
-/* RogueSD.h
+/* $Id$
 
   Rogue Robotics SD Library
   File System interface for:
@@ -16,25 +16,21 @@
   See http://www.roguerobotics.com/faq/update_firmware for updating firmware.
 
   Written by Brett Hagman
+  http://www.roguerobotics.com/
+  bhagman@roguerobotics.com
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+    This library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-Version Modified By Date     Comments
-------- ----------- -------- --------
-0001    B Hagman    09/06/21 Initial coding
-0002    B Hagman    09/12/18 Fixed filecount()
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************/
 
@@ -151,12 +147,15 @@ int8_t RogueSD::sync(void)
 }
 
 
-int8_t RogueSD::status(void)
+int8_t RogueSD::status(int8_t handle)
 {
   int8_t resp = 0;
 
   if (_moduletype != uMMC) { print("FC"); };
-  print('Z'); print('\r');              // Get status
+  print('Z');
+  if (handle > 0)
+    write('0'+handle);
+  print('\r');              // Get status
   
   resp = _get_response();
 
@@ -236,7 +235,11 @@ void RogueSD::settime(int rtc[])
     }
 
     print('\r');
-    _read_blocked();                    // consume prompt
+ 
+    // A bug in earlier versions returned the time after setting
+    while(_read_blocked() != _promptchar);  // kludge: read everything including prompt
+
+    // _read_blocked();                    // consume prompt
   }
 }
 
@@ -443,11 +446,16 @@ int32_t RogueSD::filecount(const char *filemask)
 int8_t RogueSD::readdir(char *filename, const char *filemask)
 {
   // retrieve the next file from the directory
-  // return -1 for no more files (EOF)
+  // returns:
+  // 0 if entry is a file
+  // 1 if entry is a folder/directory
+  // -1 for no more files (EOF)
+  // -2 on disaster
 
   // currently using the original file listing style, i.e. D/fs filename
 
   char c;
+  int8_t entrytype = 0;
 
   if ((_moduletype == uMMC && _fwversion < UMMC_MIN_FW_VERSION_FOR_NEW_COMMANDS) ||
       (_moduletype == uMP3 && _fwversion < UMP3_MIN_FW_VERSION_FOR_NEW_COMMANDS))
@@ -479,11 +487,13 @@ int8_t RogueSD::readdir(char *filename, const char *filemask)
       {
         // we have a directory
         _comm_read();                     // consume 'D'
+        entrytype = 1;
       }
       else
       {
         // it's a file, with a file size
         _getnumber(10);                     // discard (for now)
+        entrytype = 0;
       }
 
       _read_blocked();                      // consume separator ' '
@@ -497,11 +507,78 @@ int8_t RogueSD::readdir(char *filename, const char *filemask)
       
       _read_blocked();                      // consume prompt
       
-      return 0;
+      return entrytype;
     }
   }
 }
 
+int8_t RogueSD::entrytofilename(char *filename, const char *filemask, uint16_t entrynum)
+{
+  char c;
+  int8_t entrytype = 0;
+
+  if ((_moduletype == uMMC && _fwversion < UMMC_MIN_FW_VERSION_FOR_NEW_COMMANDS) ||
+      (_moduletype == uMP3 && _fwversion < UMP3_MIN_FW_VERSION_FOR_NEW_COMMANDS))
+  {
+    // old
+    LastErrorCode = ERROR_NOT_SUPPORTED;
+    return -1;
+  }
+  else
+  {
+    // new
+    if (_moduletype != uMMC) { print("FC"); };
+    print("LE "); print(entrynum, DEC); print(' '); print(filemask); print('\r');
+
+    if(_get_response())
+    {
+      // had an error
+      return -1;
+    }
+    else
+    {
+      // we have the file info next
+      while(!_comm_available());
+
+      if(_comm_peek() == 'D')
+      {
+        // we have a directory
+        _comm_read();                     // consume 'D'
+        entrytype = 1;
+      }
+      else
+      {
+        // it's a file, with a file size
+        _getnumber(10);                     // discard (for now)
+        entrytype = 0;
+      }
+
+      _read_blocked();                      // consume separator ' '
+
+      // now get filename
+      while((c = _read_blocked()) != '\r')
+      {
+        *filename++ = c;
+      }
+      *filename = 0;                        // terminate string
+      
+      _read_blocked();                      // consume prompt
+      
+      return entrytype;
+    }
+  }
+}
+
+
+
+int8_t RogueSD::remove(const char *filename)
+{
+  if (_moduletype != uMMC) { print("FC"); };
+
+  print('E'); print(filename); print('\r');
+
+  return _get_response();
+}
 
 
 // Read a single byte from the given handle.
@@ -688,6 +765,21 @@ int8_t RogueSD::write(int8_t handle, uint16_t count, const char *data)
 }
 
 
+int8_t RogueSD::writebyte(int8_t handle, char data)
+{
+  if (_moduletype != uMMC) { print("FC"); };
+  print('W'); write('0'+handle); print(' '); print('1'); print('\r');
+
+  write(data);
+
+  // after we are done, check the response
+  if(_get_response())
+    return -1;
+  else
+    return 0;
+}
+
+
 fileinfo RogueSD::getfileinfo(int8_t handle)
 {
   fileinfo fi;
@@ -717,6 +809,56 @@ fileinfo RogueSD::getfileinfo(int8_t handle)
   
   return fi;
 }
+
+int32_t RogueSD::getfilesize(const char *filename)
+{
+  char c;
+  uint32_t filesize = 0;
+
+  if ((_moduletype == uMMC && _fwversion < UMMC_MIN_FW_VERSION_FOR_NEW_COMMANDS) ||
+      (_moduletype == uMP3 && _fwversion < UMP3_MIN_FW_VERSION_FOR_NEW_COMMANDS))
+  {
+    // old
+    LastErrorCode = ERROR_NOT_SUPPORTED;
+    return -1;
+  }
+  else
+  {
+    // new
+    if (_moduletype != uMMC) { print("FC"); };
+    print("L "); print(filename); print('\r');
+
+    if(_get_response())
+    {
+      // had an error
+      return -1;
+    }
+    else
+    {
+      // we have the file info next
+      while(!_comm_available());
+
+      if(_comm_peek() == 'D')
+      {
+        // we have a directory, file size = 0
+        _comm_read();                       // consume 'D'
+      }
+      else
+      {
+        // it's a file, with a file size
+        filesize = _getnumber(10);          // discard (for now)
+      }
+
+      // clear the rest
+      while((c = _read_blocked()) != '\r');
+
+      _read_blocked();                      // consume prompt
+
+      return (int32_t) filesize;      
+    }
+  }
+}
+
 
 
 int8_t RogueSD::seek(int8_t handle, uint32_t newposition)
@@ -847,7 +989,7 @@ int16_t RogueSD::_get_version(void)
   // ignore beta version (-bxxx), if it's there
   if (_read_blocked() == '-')
   {
-    for (char i = 0; i < 4; i++)
+    for (char i = 0; i < 5; i++) // drop bxxx plus space
       _read_blocked();
   }
   // otherwise, it was a space

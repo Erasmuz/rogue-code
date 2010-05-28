@@ -1,4 +1,4 @@
-/* RogueSD.h
+/* $Id$
 
   Rogue Robotics SD Library
   File System interface for:
@@ -16,20 +16,21 @@
   See http://www.roguerobotics.com/faq/update_firmware for updating firmware.
 
   Written by Brett Hagman
+  http://www.roguerobotics.com/
+  bhagman@roguerobotics.com
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+    This library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Version Modified By Date     Comments
 ------- ----------- -------- --------
@@ -117,7 +118,9 @@ class RogueSD : public Print
 
     moduletype getmoduletype(void) { return _moduletype; }
 
-    int8_t status(void);
+//    int8_t status(void);
+    int8_t status(int8_t handle = 0);
+
     int8_t getfreehandle(void);
     int8_t open(const char *filename);
     int8_t open(const char *filename, open_mode mode);
@@ -132,8 +135,10 @@ class RogueSD : public Print
     int32_t filecount(const char *filemask);
     int8_t readdir(char *filename, const char *filemask);
 
+    int8_t entrytofilename(char *filename, const char *filemask, uint16_t entrynum);
+
     // delete/remove a file/directory (directory must be empty)
-//    int8_t remove(const char *filename);
+    int8_t remove(const char *filename);
 
     // rename a file/directory
 //    int8_t rename(const char *oldname, const char *newname);
@@ -158,8 +163,11 @@ class RogueSD : public Print
     // write exactly count bytes to file
     int8_t write(int8_t handle, uint16_t count, const char *data);
 
+    // write a single byte to the file
+    int8_t writebyte(int8_t handle, char data);
+
     fileinfo getfileinfo(int8_t handle);
-//    uint32_t getfilesize(const char *filename); // get using "L filename"
+    int32_t getfilesize(const char *filename); // get using "L filename"
     
     int8_t seek(int8_t handle, uint32_t newposition);
     int8_t seektoend(int8_t handle);
