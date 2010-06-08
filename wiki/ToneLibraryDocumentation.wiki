@@ -229,7 +229,9 @@ Although F,,high,, can go as high as 8 MHz, the [http://en.wikipedia.org/wiki/He
 
 Tone accuracy is dependent on the timer prescalar.  Frequency quantization occurs as the frequencies increase per prescalar.
 
-If you used a 16 bit timer (e.g. timer 1, or timers 3,4,5 on '1280), you could generate "tones" down to 1/8 Hz (one cycle every 8 seconds), although the library only accept integers for frequency.
+If you used a 16 bit timer (e.g. timer 1, or timers 3,4,5 on '1280), you could generate "tones" down to 1/8 Hz (one cycle every 8 seconds), although the library only accepts integers for frequency.
+
+After all is said and done, because `play()` only accepts unsigned integers for frequency, the maximum frequency that can be produced is 65535 Hz - which, after rounding, results in a 65573.77 Hz "tone" on a 16 MHz part.
 
 ----
 
