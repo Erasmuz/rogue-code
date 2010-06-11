@@ -1,132 +1,97 @@
-/*
-  HardwareSerial.cpp - Hardware serial library for Wiring
-  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+/* $Id$
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+  Hardware Serial Library Class
+  Redesigned for RX and TX buffering using FIFO (by Alexander Brevig)
+  by Brett Hagman
+  http://www.roguerobotics.com/
+  bhagman@roguerobotics.com
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-  
-  Modified 23 November 2006 by David A. Mellis
+  Original Source:
+    HardwareSerial.cpp - Hardware serial library for Wiring - 2006 Nicholas Zambetti
+  Modifications:
+    23 November 2006 by David A. Mellis
+
+
+    This library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#include <stdio.h>
-#include <string.h>
-#include <inttypes.h>
-#include "wiring.h"
-#include "wiring_private.h"
 
 #include "HardwareSerial.h"
 
-// Define constants and variables for buffering incoming serial data.  We're
-// using a ring buffer (I think), in which rx_buffer_head is the index of the
-// location to which to write the next incoming character and rx_buffer_tail
-// is the index of the location from which to read.
-#define RX_BUFFER_SIZE 128
-
-struct ring_buffer {
-  unsigned char buffer[RX_BUFFER_SIZE];
-  int head;
-  int tail;
-};
-
-ring_buffer rx_buffer = { { 0 }, 0, 0 };
-
-#if defined(__AVR_ATmega1280__)
-ring_buffer rx_buffer1 = { { 0 }, 0, 0 };
-ring_buffer rx_buffer2 = { { 0 }, 0, 0 };
-ring_buffer rx_buffer3 = { { 0 }, 0, 0 };
+// Small fix for atmega8
+#if !defined(__AVR_ATmega8__)
+#define RXCIE RXCIE0
+#define UDRIE UDRIE0
+#define RXEN  RXEN0
+#define TXEN  TXEN0
+#define UDRE  UDRE0
+#define U2X   U2X0
 #endif
 
-inline void store_char(unsigned char c, ring_buffer *rx_buffer)
+ISR(Serial_RX_vect)
 {
-  int i = (rx_buffer->head + 1) % RX_BUFFER_SIZE;
-
-  // if we should be storing the received character into the location
-  // just before the tail (meaning that the head would advance to the
-  // current location of the tail), we're about to overflow the buffer
-  // and so we don't write the character or advance the head.
-  if (i != rx_buffer->tail) {
-    rx_buffer->buffer[rx_buffer->head] = c;
-    rx_buffer->head = i;
-  }
+  Serial.rxfifo.enqueue(*Serial._udr);
 }
 
-#if defined(__AVR_ATmega1280__)
-
-SIGNAL(SIG_USART0_RECV)
+ISR(Serial_TX_vect)
 {
-  unsigned char c = UDR0;
-  store_char(c, &rx_buffer);
+  if (Serial.txfifo.count() > 0)
+    *Serial._udr = Serial.txfifo.dequeue();
+
+  if (Serial.txfifo.count() == 0)
+    *Serial._ucsrb = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
 }
 
-SIGNAL(SIG_USART1_RECV)
+
+#if SerialPorts > 1
+ISR(Serial1_RX_vect)
 {
-  unsigned char c = UDR1;
-  store_char(c, &rx_buffer1);
+  Serial1.rxfifo.enqueue(*Serial1._udr);
 }
-
-SIGNAL(SIG_USART2_RECV)
-{
-  unsigned char c = UDR2;
-  store_char(c, &rx_buffer2);
-}
-
-SIGNAL(SIG_USART3_RECV)
-{
-  unsigned char c = UDR3;
-  store_char(c, &rx_buffer3);
-}
-
-#else
-
-#if defined(__AVR_ATmega8__)
-SIGNAL(SIG_UART_RECV)
-#else
-SIGNAL(USART_RX_vect)
-#endif
-{
-#if defined(__AVR_ATmega8__)
-  unsigned char c = UDR;
-#else
-  unsigned char c = UDR0;
-#endif
-  store_char(c, &rx_buffer);
-}
-
 #endif
 
-// Constructors ////////////////////////////////////////////////////////////////
-
-HardwareSerial::HardwareSerial(ring_buffer *rx_buffer,
-  volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
-  volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
-  volatile uint8_t *udr,
-  uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udre, uint8_t u2x)
+#if SerialPorts > 2
+ISR(Serial2_RX_vect)
 {
-  _rx_buffer = rx_buffer;
-  _ubrrh = ubrrh;
-  _ubrrl = ubrrl;
+  Serial2.rxfifo.enqueue(*Serial2._udr);
+}
+#endif
+
+#if SerialPorts > 3
+ISR(Serial3_RX_vect)
+{
+  Serial3.rxfifo.enqueue(*Serial3._udr);
+}
+#endif
+
+
+// Constructor
+
+HardwareSerial::HardwareSerial(
+  volatile uint16_t *ubrr,
+  volatile uint8_t *ucsra,
+  volatile uint8_t *ucsrb,
+  volatile uint8_t *udr)
+{
+  _ubrr = ubrr;
   _ucsra = ucsra;
   _ucsrb = ucsrb;
   _udr = udr;
-  _rxen = rxen;
-  _txen = txen;
-  _rxcie = rxcie;
-  _udre = udre;
-  _u2x = u2x;
 }
 
-// Public Methods //////////////////////////////////////////////////////////////
+
+// Public Methods
 
 void HardwareSerial::begin(long baud)
 {
@@ -149,7 +114,7 @@ void HardwareSerial::begin(long baud)
   }
   
   if (use_u2x) {
-    *_ucsra = 1 << _u2x;
+    *_ucsra = 1 << U2X;
     baud_setting = (F_CPU / 4 / baud - 1) / 2;
   } else {
     *_ucsra = 0;
@@ -157,70 +122,74 @@ void HardwareSerial::begin(long baud)
   }
 
   // assign the baud_setting, a.k.a. ubbr (USART Baud Rate Register)
-  *_ubrrh = baud_setting >> 8;
-  *_ubrrl = baud_setting;
 
-  sbi(*_ucsrb, _rxen);
-  sbi(*_ucsrb, _txen);
-  sbi(*_ucsrb, _rxcie);
+	*_ubrr = baud_setting;
+  *_ucsrb = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
 }
+
 
 void HardwareSerial::end()
 {
-  cbi(*_ucsrb, _rxen);
-  cbi(*_ucsrb, _txen);
-  cbi(*_ucsrb, _rxcie);  
+  *_ucsrb &= ~(1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
 }
+
 
 uint8_t HardwareSerial::available(void)
 {
-  return (RX_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % RX_BUFFER_SIZE;
+  return rxfifo.count();
 }
+
 
 int HardwareSerial::read(void)
 {
-  // if the head isn't ahead of the tail, we don't have any characters
-  if (_rx_buffer->head == _rx_buffer->tail) {
+  if (rxfifo.count())
+    return rxfifo.dequeue();
+  else
     return -1;
-  } else {
-    unsigned char c = _rx_buffer->buffer[_rx_buffer->tail];
-    _rx_buffer->tail = (_rx_buffer->tail + 1) % RX_BUFFER_SIZE;
-    return c;
-  }
 }
+
+
+int HardwareSerial::peek(void)
+{
+  if (rxfifo.count())
+    return rxfifo.peek();
+  else
+    return -1;
+}
+
 
 void HardwareSerial::flush()
 {
-  // don't reverse this or there may be problems if the RX interrupt
-  // occurs after reading the value of rx_buffer_head but before writing
-  // the value to rx_buffer_tail; the previous value of rx_buffer_head
-  // may be written to rx_buffer_tail, making it appear as if the buffer
-  // don't reverse this or there may be problems if the RX interrupt
-  // occurs after reading the value of rx_buffer_head but before writing
-  // the value to rx_buffer_tail; the previous value of rx_buffer_head
-  // may be written to rx_buffer_tail, making it appear as if the buffer
-  // were full, not empty.
-  _rx_buffer->head = _rx_buffer->tail;
+  rxfifo.flush();
 }
+
 
 void HardwareSerial::write(uint8_t c)
 {
-  while (!((*_ucsra) & (1 << _udre)))
-    ;
+	// We will block here until we have some space free in the FIFO
+	while (txfifo.count() >= TX_BUFFER_SIZE);
 
-  *_udr = c;
+  cli();
+  txfifo.enqueue(c);
+  *_ucsrb |= (1 << UDRIE);
+  sei();
 }
 
-// Preinstantiate Objects //////////////////////////////////////////////////////
+
+// Preinstantiate Objects
 
 #if defined(__AVR_ATmega8__)
-HardwareSerial Serial(&rx_buffer, &UBRRH, &UBRRL, &UCSRA, &UCSRB, &UDR, RXEN, TXEN, RXCIE, UDRE, U2X);
+HardwareSerial Serial(&UBRR, &UCSRA, &UCSRB, &UDR);
 #else
-HardwareSerial Serial(&rx_buffer, &UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UDR0, RXEN0, TXEN0, RXCIE0, UDRE0, U2X0);
+HardwareSerial Serial(&UBRR0, &UCSR0A, &UCSR0B, &UDR0);
 #endif
 
-#if defined(__AVR_ATmega1280__)
-HardwareSerial Serial1(&rx_buffer1, &UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UDR1, RXEN1, TXEN1, RXCIE1, UDRE1, U2X1);
-HardwareSerial Serial2(&rx_buffer2, &UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UDR2, RXEN2, TXEN2, RXCIE2, UDRE2, U2X2);
-HardwareSerial Serial3(&rx_buffer3, &UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UDR3, RXEN3, TXEN3, RXCIE3, UDRE3, U2X3);
+#if SerialPorts > 1
+HardwareSerial Serial1(&UBRR1, &UCSR1A, &UCSR1B, &UDR1);
+#endif
+#if SerialPorts > 2
+HardwareSerial Serial2(&UBRR2, &UCSR2A, &UCSR2B, &UDR2);
+#endif
+#if SerialPorts > 3
+HardwareSerial Serial3(&UBRR3, &UCSR3A, &UCSR3B, &UDR3);
 #endif

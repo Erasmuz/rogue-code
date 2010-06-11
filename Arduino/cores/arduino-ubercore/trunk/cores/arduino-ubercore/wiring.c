@@ -19,7 +19,7 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id: wiring.c 808 2009-12-18 17:44:08Z dmellis $
+  $Id$
 */
 
 #include "wiring_private.h"

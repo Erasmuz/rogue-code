@@ -19,7 +19,7 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id: wiring.h 249 2007-02-03 16:52:51Z mellis $
+  $Id$
 */
 
 #ifndef Pins_Arduino_h
