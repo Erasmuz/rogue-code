@@ -468,7 +468,10 @@ int8_t RogueSD::readdir(char *filename, const char *filemask)
   {
     // new
     if (_moduletype != uMMC) { print("FC"); };
-    print("LI "); print(filemask); print('\r');
+    print("LI ");
+    if (filemask)
+      print(filemask);
+    print('\r');
 
     if(_get_response())
     {
@@ -512,7 +515,7 @@ int8_t RogueSD::readdir(char *filename, const char *filemask)
   }
 }
 
-int8_t RogueSD::entrytofilename(char *filename, const char *filemask, uint16_t entrynum)
+int8_t RogueSD::entrytofilename(char *filename, uint8_t count, const char *filemask, uint16_t entrynum)
 {
   char c;
   int8_t entrytype = 0;
@@ -558,7 +561,11 @@ int8_t RogueSD::entrytofilename(char *filename, const char *filemask, uint16_t e
       // now get filename
       while((c = _read_blocked()) != '\r')
       {
-        *filename++ = c;
+        if (count > 0)
+        {
+          count--;
+          *filename++ = c;
+        }
       }
       *filename = 0;                        // terminate string
       

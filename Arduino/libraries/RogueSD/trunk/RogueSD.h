@@ -135,7 +135,7 @@ class RogueSD : public Print
     int32_t filecount(const char *filemask);
     int8_t readdir(char *filename, const char *filemask);
 
-    int8_t entrytofilename(char *filename, const char *filemask, uint16_t entrynum);
+    int8_t entrytofilename(char *filename, uint8_t count, const char *filemask, uint16_t entrynum);
 
     // delete/remove a file/directory (directory must be empty)
     int8_t remove(const char *filename);
