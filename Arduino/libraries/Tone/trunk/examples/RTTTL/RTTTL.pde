@@ -5,7 +5,7 @@
 // Don't forget to connect the other side of the speaker to ground!
 
 // You can get more RTTTL (RingTone Text Transfer Language) songs from
-// http://merwin.bespin.org/db/rts/index.php
+// http://code.google.com/p/rogue-code/wiki/ToneLibraryDocumentation
 
 #include <Tone.h>
 

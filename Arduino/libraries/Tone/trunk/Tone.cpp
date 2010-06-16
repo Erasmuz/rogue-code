@@ -1,32 +1,23 @@
-/* Tone.cpp
+/* $Id$
 
   A Tone Generator Library
 
   Written by Brett Hagman
+  http://www.roguerobotics.com/
+  bhagman@roguerobotics.com
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+    This library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-Version Modified By Date     Comments
-------- ----------- -------- --------
-0001    B Hagman    09/08/02 Initial coding
-0002    B Hagman    09/08/18 Multiple pins
-0003    B Hagman    09/08/18 Moved initialization from constructor to begin()
-0004    B Hagman    09/09/26 Fixed problems with ATmega8
-0005    B Hagman    09/11/23 Scanned prescalars for best fit on 8 bit timers
-                    09/11/25 Changed pin toggle method to XOR
-                    09/11/25 Fixed timer0 from being excluded
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************/
 
@@ -54,26 +45,26 @@ Version Modified By Date     Comments
 //  < 0 - infinitely (until stop() method called, or new play() called)
 
 #if !defined(__AVR_ATmega8__)
-volatile long timer0_toggle_count;
+volatile int32_t timer0_toggle_count;
 volatile uint8_t *timer0_pin_port;
 volatile uint8_t timer0_pin_mask;
 #endif
 
-volatile long timer1_toggle_count;
+volatile int32_t timer1_toggle_count;
 volatile uint8_t *timer1_pin_port;
 volatile uint8_t timer1_pin_mask;
-volatile long timer2_toggle_count;
+volatile int32_t timer2_toggle_count;
 volatile uint8_t *timer2_pin_port;
 volatile uint8_t timer2_pin_mask;
 
 #if defined(__AVR_ATmega1280__)
-volatile long timer3_toggle_count;
+volatile int32_t timer3_toggle_count;
 volatile uint8_t *timer3_pin_port;
 volatile uint8_t timer3_pin_mask;
-volatile long timer4_toggle_count;
+volatile int32_t timer4_toggle_count;
 volatile uint8_t *timer4_pin_port;
 volatile uint8_t timer4_pin_mask;
-volatile long timer5_toggle_count;
+volatile int32_t timer5_toggle_count;
 volatile uint8_t *timer5_pin_port;
 volatile uint8_t timer5_pin_mask;
 #endif
@@ -195,10 +186,10 @@ void Tone::begin(uint8_t tonePin)
 
 // frequency (in hertz) and duration (in milliseconds).
 
-void Tone::play(unsigned int frequency, unsigned long duration)
+void Tone::play(uint32_t frequency, uint32_t duration)
 {
   uint8_t prescalarbits = 0b001;
-  long toggle_count = 0;
+  int32_t toggle_count = 0;
   uint32_t ocr = 0;
 
   if (_timer >= 0)
