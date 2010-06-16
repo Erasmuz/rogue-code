@@ -14,5 +14,3 @@ Version Modified By Date     Comments
                     09/11/25 Fixed: Pin toggle method to XOR.
                     09/11/25 Fixed: timer0 from being excluded.
 0006    B Hagman    10/03/21 Fixed: License updates, minor fixes.
-                    10/06/16 Fixed: Frequency parameter of play() to uint32_t
-                                    to allow for frequencies beyond audible range.

@@ -186,7 +186,7 @@ void Tone::begin(uint8_t tonePin)
 
 // frequency (in hertz) and duration (in milliseconds).
 
-void Tone::play(uint32_t frequency, uint32_t duration)
+void Tone::play(uint16_t frequency, uint32_t duration)
 {
   uint8_t prescalarbits = 0b001;
   int32_t toggle_count = 0;
@@ -446,20 +446,23 @@ ISR(TIMER1_COMPA_vect)
 
 ISR(TIMER2_COMPA_vect)
 {
+  int32_t temp_toggle_count = timer2_toggle_count;
 
-  if (timer2_toggle_count != 0)
+  if (temp_toggle_count != 0)
   {
     // toggle the pin
     *timer2_pin_port ^= timer2_pin_mask;
 
-    if (timer2_toggle_count > 0)
-      timer2_toggle_count--;
+    if (temp_toggle_count > 0)
+      temp_toggle_count--;
   }
   else
   {
     TIMSK2 = 0;   // disable the interrupt
     *timer2_pin_port &= ~(timer2_pin_mask);  // keep pin low after stop
   }
+  
+  timer2_toggle_count = temp_toggle_count;
 }
 
 
