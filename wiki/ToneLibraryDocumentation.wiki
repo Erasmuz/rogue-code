@@ -18,10 +18,6 @@ The pin can be connected to a piezo buzzer or other speaker to play tones.
 
 Be sure to try out the RTTTL (!RingTone Text Transfer Language) example!
 
-=== NEW! ===
-
-As of V0006, `play()` accepts frequencies as `uint32_t` (i.e. `unsigned long`, 32 bit unsigned long integer) - this means that you can produce square waves beyond the audible range - see [#Ugly_Details Ugly Details] for more information.
-
 === Arduino Core Version ===
 
 A simplified version of the Tone library has been incorporated into the Arduino core since 0018.  It only provides a single tone (since only one timer is used).  You can find the core documentation [http://arduino.cc/en/Reference/Tone here].
@@ -235,7 +231,7 @@ Tone accuracy is dependent on the timer prescalar.  Frequency quantization occur
 
 If you used a 16 bit timer (e.g. timer 1, or timers 3,4,5 on '1280), you could generate "tones" down to 1/8 Hz (one cycle every 8 seconds), although the library only accepts integers for frequency.
 
-After all is said and done, because `play()` only accepts unsigned integers for frequency, the maximum frequency that can be produced is 65535 Hz - which, after rounding, results in a 65573.77 Hz "tone" on a 16 MHz part.
+After all is said and done, because `play()` only accepts unsigned integers for frequency, the maximum frequency that can be produced is 65535 Hz - which, after rounding, results in a 65573.77 Hz "tone" on a 16 MHz part.  Even if play accepted larger values for frequency, you couldn't achieve better than around 80KHz with the Tone library because the pin toggling is done in software.  Each toggle, in software, requires _AT LEAST_ 50+ cycles.
 
 ----
 
