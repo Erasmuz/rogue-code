@@ -120,8 +120,8 @@ class RogueMP3 : public Print
     moduletype getmoduletype(void) { return _moduletype; }
 
     // Play Command ("PC") methods
-    int8_t playfile(const char *filename, uint8_t pgmspc=0);
-    int8_t playfile_P(const prog_char *filename);
+    int8_t playfile_P(const char *path);
+    int8_t playfile(const char *path, const char *filename = NULL, uint8_t pgmspc = 0);
     void setloop(uint8_t loopcount);
     void jump(uint16_t newtime);
     void setboost(uint8_t bass_amp, uint8_t bass_freq, int8_t treble_amp, uint8_t treble_freq);
@@ -144,6 +144,9 @@ class RogueMP3 : public Print
     char getplaybackstatus(void);
     uint8_t getspectrumanalyzer(uint8_t values[], uint8_t peaks=0);
     void setspectrumanalyzer(uint16_t bands[], uint8_t count);
+
+    // Information Commands ("IC" - MP3 information)
+    int16_t gettracklength(const char *path, const char *filename = NULL, uint8_t pgmspc = 0);
 
     // Settings ("ST") methods
     int8_t changesetting(char setting, const char *value);

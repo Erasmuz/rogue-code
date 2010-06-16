@@ -118,7 +118,7 @@ int8_t RogueMP3::sync(void)
 
   print('F'); print('C'); print('Z'); print('\r'); // Get status
   
-  if(_get_response())
+  if (_get_response())
     return -1;
   else
   {
@@ -151,8 +151,8 @@ int16_t RogueMP3::getsetting(char setting)
   
   print('S'); print('T'); print(setting); print('\r');
   
-  while(!_comm_available());
-  if(_comm_peek() != 'E')
+  while (!_comm_available());
+  if (_comm_peek() != 'E')
   {
     value = _getnumber(10);
     _read_blocked();                    // consume prompt
@@ -165,11 +165,12 @@ int16_t RogueMP3::getsetting(char setting)
   return value;
 }
 
-int8_t RogueMP3::playfile_P(const char *filename)
+int8_t RogueMP3::playfile_P(const char *path)
 {
-  return playfile(filename, 1);
+  return playfile(path, NULL, 1);
 }
 
+/*
 int8_t RogueMP3::playfile(const char *filename, uint8_t pgmspc)
 {
   print("PCF");
@@ -178,6 +179,26 @@ int8_t RogueMP3::playfile(const char *filename, uint8_t pgmspc)
     print_P(filename);
   else
     print(filename);
+  print('\r');
+  
+  return _get_response();
+}
+*/
+
+int8_t RogueMP3::playfile(const char *path, const char *filename, uint8_t pgmspc)
+{
+  print("PCF");
+
+  if (pgmspc == 1)
+    print_P(path);
+  else
+    print(path);
+
+  if (filename)
+  {
+    print('/');
+    print(filename);
+  }
   print('\r');
   
   return _get_response();
@@ -256,7 +277,7 @@ void RogueMP3::fade_lr(uint8_t new_vleft, uint8_t new_vright, uint16_t fadems)
 
   fadetimestep = fadems/FADE_STEPS;
 
-  if(fadetimestep<FADE_AUDIBLE_DIFF)
+  if (fadetimestep<FADE_AUDIBLE_DIFF)
   {
     // too fast to hear - just set the volume
     setvolume(new_vleft, new_vright);
@@ -274,7 +295,7 @@ void RogueMP3::fade_lr(uint8_t new_vleft, uint8_t new_vright, uint16_t fadems)
     il /= FADE_STEPS;
     ir /= FADE_STEPS;
 
-    for(i = 0; i < FADE_STEPS; i++)
+    for (i = 0; i < FADE_STEPS; i++)
     {
       vleft += il;
       vright += ir;
@@ -340,7 +361,7 @@ char RogueMP3::getplaybackstatus(void)
 
   value = _read_blocked();
 
-  while(_read_blocked() != _promptchar);
+  while (_read_blocked() != _promptchar);
   
   return value;
 }
@@ -396,7 +417,7 @@ void RogueMP3::setloop(uint8_t loopcount)
 
 
 // Added for sending prog_char strings
-void RogueMP3::print_P(const prog_char *str)
+void RogueMP3::print_P(const char *str)
 {
   while (pgm_read_byte(str) != 0)
   {
@@ -431,6 +452,7 @@ uint8_t RogueMP3::getspectrumanalyzer(uint8_t values[], uint8_t peaks)
   return count;
 }
 
+
 void RogueMP3::setspectrumanalyzer(uint16_t bands[], uint8_t count)
 {
   uint8_t i;
@@ -457,6 +479,42 @@ void RogueMP3::setspectrumanalyzer(uint16_t bands[], uint8_t count)
 }
 
 
+int16_t RogueMP3::gettracklength(const char *path, const char *filename, uint8_t pgmspc)
+{
+  int16_t tracklength = 0;
+
+  print("ICT");
+
+  if (pgmspc == 1)
+    print_P(path);
+  else
+    print(path);
+  
+  if (filename)
+  {
+    print('/');
+    print(filename);
+  }
+
+  print('\r');
+  
+  if(_get_response() == 0)
+  {
+    tracklength = _getnumber(10);
+    
+    _read_blocked();                 // consume prompt
+    
+    return tracklength;
+  }
+  else
+  {
+    // error occurred with "IC" command
+    return -1;
+  }
+}
+
+
+
 /*************************************************
 * Public (virtual)
 *************************************************/
@@ -475,7 +533,7 @@ int8_t RogueMP3::_read_blocked(void)
 {
   // int8_t r;
   
-  while(!_comm_available());
+  while (!_comm_available());
   // while((r = this->_readf()) < 0);   // this would be faster if we could guarantee that the _readf() function
                                         // would return -1 if there was no byte read
   return _comm_read();
@@ -494,10 +552,10 @@ int8_t RogueMP3::_get_response(void)
 
   r = _read_blocked();
 
-  if(r == ' ' || r == _promptchar)
+  if (r == ' ' || r == _promptchar)
     resp = 0;
 
-  else if(r == 'E')
+  else if (r == 'E')
   {
     LastErrorCode = _getnumber(16);     // get our error code
     _read_blocked();                    // consume prompt
@@ -569,30 +627,30 @@ int32_t RogueMP3::_getnumber(uint8_t base)
 	uint32_t val;
 
 	val = 0;
-	while(!_comm_available());
+	while (!_comm_available());
   c = _comm_peek();
   
   if(c == '-')
   {
     neg = 1;
     _comm_read();  // remove
-    while(!_comm_available());
+    while (!_comm_available());
     c = _comm_peek();
   }
   
-	while(((c >= 'A') && (c <= 'Z'))
+	while (((c >= 'A') && (c <= 'Z'))
 	    || ((c >= 'a') && (c <= 'z'))
 	    || ((c >= '0') && (c <= '9')))
 	{
-		if(c >= 'a') c -= 0x57;             // c = c - 'a' + 0x0a, c = c - ('a' - 0x0a)
-		else if(c >= 'A') c -= 0x37;        // c = c - 'A' + 0x0A
+		if (c >= 'a') c -= 0x57;             // c = c - 'a' + 0x0a, c = c - ('a' - 0x0a)
+		else if (c >= 'A') c -= 0x37;        // c = c - 'A' + 0x0A
 		else c -= '0';
-		if(c >= base) break;
+		if (c >= base) break;
 
 		val *= base;
 		val += c;
 		_comm_read();                     // take the byte from the queue
-		while(!_comm_available());        // wait for the next byte
+		while (!_comm_available());        // wait for the next byte
 		c = _comm_peek();
 	}
 	return neg ? -val : val;
