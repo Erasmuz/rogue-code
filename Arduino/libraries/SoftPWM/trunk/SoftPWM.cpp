@@ -101,7 +101,8 @@ ISR(TIMER2_COMPA_vect)
 
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
   {
-    if (_softpwm_channels[i].pin > 0)  // if it's a valid pin
+    if (_softpwm_channels[i].pin >= 0)  // if it's a valid pin
+//    if (_softpwm_channels[i].outport != 0)
       if (_softpwm_channels[i].checkval == _isr_softcount)  // if we have hit the width
         *_softpwm_channels[i].outport &= ~(_softpwm_channels[i].pinmask);  // turn off the channel
   }  
@@ -129,6 +130,7 @@ void SoftPWMBegin(void)
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
   {
     _softpwm_channels[i].pin = -1;
+    _softpwm_channels[i].outport = 0;
     _softpwm_channels[i].fadeuprate = 0;
     _softpwm_channels[i].fadedownrate = 0;
   }
@@ -155,13 +157,13 @@ void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset)
   // If the pin isn't already set, add it
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
   {
-    if ((pin < 0 && _softpwm_channels[i].pin > 0) ||  // ALL pins
-       (pin > 0 && _softpwm_channels[i].pin == pin))  // individual pin
+    if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+       (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
     {
       // set the pin (and exit, if individual pin)
       _softpwm_channels[i].pwmvalue = value;
 
-      if (pin > 0) // we've set the individual pin
+      if (pin >= 0) // we've set the individual pin
         return;
     }
 
@@ -170,14 +172,14 @@ void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset)
       firstfree = i;
   }
 
-  if (pin > 0 && firstfree >= 0)
+  if (pin >= 0 && firstfree >= 0)
   {
     // we have a free pin we can use
     _softpwm_channels[firstfree].pin = pin;
     _softpwm_channels[firstfree].outport = portOutputRegister(digitalPinToPort(pin));
     _softpwm_channels[firstfree].pinmask = digitalPinToBitMask(pin);
     _softpwm_channels[firstfree].pwmvalue = value;
-    _softpwm_channels[firstfree].checkval = 0;
+//    _softpwm_channels[firstfree].checkval = 0;
     
     // now prepare the pin for output
     digitalWrite(pin, 0);  // turn it off to start (no glitch)
@@ -191,8 +193,8 @@ void SoftPWMEnd(int8_t pin)
 
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
   {
-    if ((pin < 0 && _softpwm_channels[i].pin > 0) ||  // ALL pins
-       (pin > 0 && _softpwm_channels[i].pin == pin))  // individual pin
+    if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+       (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
     {
       // now disable the pin (put it into INPUT mode)
       digitalWrite(_softpwm_channels[i].pin, 1);
@@ -200,6 +202,7 @@ void SoftPWMEnd(int8_t pin)
 
       // remove the pin
       _softpwm_channels[i].pin = -1;
+//      _softpwm_channels[i].outport = 0;
     }
   }
 }
@@ -212,8 +215,8 @@ void SoftPWMSetFadeTime(int8_t pin, uint16_t fadeUpTime, uint16_t fadeDownTime)
 
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
   {
-    if ((pin < 0 && _softpwm_channels[i].pin > 0) ||  // ALL pins
-       (pin > 0 && _softpwm_channels[i].pin == pin))  // individual pin
+    if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+       (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
     {
 
       fadeAmount = 0;
@@ -228,7 +231,7 @@ void SoftPWMSetFadeTime(int8_t pin, uint16_t fadeUpTime, uint16_t fadeDownTime)
 
       _softpwm_channels[i].fadedownrate = fadeAmount;
 
-      if (pin > 0)  // we've set individual pin
+      if (pin >= 0)  // we've set individual pin
         break;
     }
   }
