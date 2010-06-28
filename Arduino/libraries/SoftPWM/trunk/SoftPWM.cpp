@@ -6,6 +6,8 @@
   http://www.roguerobotics.com/
   bhagman@roguerobotics.com
 
+  Minor modification by Paul Stoffregen to support different timers
+
     This library is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -24,6 +26,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "SoftPWM.h"
+#include "SoftPWM_timer.h"
 #include <wiring.h>
 #include <pins_arduino.h>
 
@@ -52,9 +55,8 @@ typedef struct
 softPWMChannel _softpwm_channels[SOFTPWM_MAXCHANNELS];
 
 
-
 // Here is the meat and gravy
-ISR(TIMER2_COMPA_vect)
+ISR(SOFTPWM_TIMER_INTERRUPT)
 {
   uint8_t i;
   int16_t newvalue;
@@ -102,7 +104,6 @@ ISR(TIMER2_COMPA_vect)
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
   {
     if (_softpwm_channels[i].pin >= 0)  // if it's a valid pin
-//    if (_softpwm_channels[i].outport != 0)
       if (_softpwm_channels[i].checkval == _isr_softcount)  // if we have hit the width
         *_softpwm_channels[i].outport &= ~(_softpwm_channels[i].pinmask);  // turn off the channel
   }  
@@ -120,12 +121,8 @@ void SoftPWMBegin(void)
   // approximately 60Hz (~16ms).
 
   uint8_t i;
-  
-  TIFR2 = (1 << TOV2);          // clear interrupt flag
-  TCCR2B = (1 << CS21);         // start timer (ck/8 prescalar)
-  TCCR2A = (1 << WGM21);        // CTC mode
-  OCR2A = SOFTPWM_OCR;          // We want to have at least 30Hz or else it gets choppy
-  TIMSK2 = (1 << OCIE2A);       // enable timer2 output compare match interrupt
+
+  SOFTPWM_TIMER_INIT(SOFTPWM_OCR);
 
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
   {
@@ -150,7 +147,7 @@ void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset)
 
   if (hardset)
   {
-    TCNT2 = 0;
+    SOFTPWM_TIMER_SET(0);
     _isr_softcount = 0xff;
   }
 
@@ -202,7 +199,6 @@ void SoftPWMEnd(int8_t pin)
 
       // remove the pin
       _softpwm_channels[i].pin = -1;
-//      _softpwm_channels[i].outport = 0;
     }
   }
 }
