@@ -32,7 +32,9 @@ setloop	KEYWORD2
 setvolume	KEYWORD2
 stop	KEYWORD2
 sync	KEYWORD2
-
+getspectrumanalyzer	KEYWORD2
+setspectrumanalyzer	KEYWORD2
+gettracklength	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
