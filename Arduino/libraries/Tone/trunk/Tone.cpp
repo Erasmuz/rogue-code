@@ -240,10 +240,10 @@ void Tone::play(uint16_t frequency, uint32_t duration)
 
 #if !defined(__AVR_ATmega8__)
       if (_timer == 0)
-        TCCR0B = prescalarbits;
+        TCCR0B = (TCCR0B & 0b11111000) | prescalarbits;
       else
 #endif
-        TCCR2B = prescalarbits;
+        TCCR2B = (TCCR2B & 0b11111000) | prescalarbits;
     }
     else
     {
@@ -333,35 +333,27 @@ void Tone::stop()
 {
   switch (_timer)
   {
-#if defined(__AVR_ATmega8__)
-    case 1:
-      bitWrite(TIMSK1, OCIE1A, 0);
-      break;
-    case 2:
-      bitWrite(TIMSK2, OCIE2A, 0);
-      break;
-
-#else
+#if !defined(__AVR_ATmega8__)
     case 0:
-      TIMSK0 = 0;
-      break;
-    case 1:
-      TIMSK1 = 0;
-      break;
-    case 2:
-      TIMSK2 = 0;
+      TIMSK0 &= ~(1 << OCIE0A);
       break;
 #endif
+    case 1:
+      TIMSK1 &= ~(1 << OCIE1A);
+      break;
+    case 2:
+      TIMSK2 &= ~(1 << OCIE2A);
+      break;
 
 #if defined(__AVR_ATmega1280__)
     case 3:
-      TIMSK3 = 0;
+      TIMSK3 &= ~(1 << OCIE3A);
       break;
     case 4:
-      TIMSK4 = 0;
+      TIMSK4 &= ~(1 << OCIE4A);
       break;
     case 5:
-      TIMSK5 = 0;
+      TIMSK5 &= ~(1 << OCIE5A);
       break;
 #endif
   }
@@ -378,26 +370,26 @@ bool Tone::isPlaying(void)
   {
 #if !defined(__AVR_ATmega8__)
     case 0:
-      returnvalue = (timer0_toggle_count > 0) || (TIMSK0 & (1 << OCIE0A));
+      returnvalue = (TIMSK0 & (1 << OCIE0A));
       break;
 #endif
 
     case 1:
-      returnvalue = (timer1_toggle_count > 0) || (TIMSK1 & (1 << OCIE1A));
+      returnvalue = (TIMSK1 & (1 << OCIE1A));
       break;
     case 2:
-      returnvalue = (timer2_toggle_count > 0) || (TIMSK2 & (1 << OCIE2A));
+      returnvalue = (TIMSK2 & (1 << OCIE2A));
       break;
 
 #if defined(__AVR_ATmega1280__)
     case 3:
-      returnvalue = (timer3_toggle_count > 0) || (TIMSK3 & (1 << OCIE3A));
+      returnvalue = (TIMSK3 & (1 << OCIE3A));
       break;
     case 4:
-      returnvalue = (timer4_toggle_count > 0) || (TIMSK4 & (1 << OCIE4A));
+      returnvalue = (TIMSK4 & (1 << OCIE4A));
       break;
     case 5:
-      returnvalue = (timer5_toggle_count > 0) || (TIMSK5 & (1 << OCIE5A));
+      returnvalue = (TIMSK5 & (1 << OCIE5A));
       break;
 #endif
 
@@ -419,8 +411,8 @@ ISR(TIMER0_COMPA_vect)
   }
   else
   {
-    TIMSK0 = 0;   // disable the interrupt
-    *timer0_pin_port &= ~(timer0_pin_mask);  // keep pin low after stop
+    TIMSK0 &= ~(1 << OCIE0A);                 // disable the interrupt
+    *timer0_pin_port &= ~(timer0_pin_mask);   // keep pin low after stop
   }
 }
 #endif
@@ -438,8 +430,8 @@ ISR(TIMER1_COMPA_vect)
   }
   else
   {
-    TIMSK1 = 0;   // disable the interrupt
-    *timer1_pin_port &= ~(timer1_pin_mask);  // keep pin low after stop
+    TIMSK1 &= ~(1 << OCIE1A);                 // disable the interrupt
+    *timer1_pin_port &= ~(timer1_pin_mask);   // keep pin low after stop
   }
 }
 
@@ -458,8 +450,8 @@ ISR(TIMER2_COMPA_vect)
   }
   else
   {
-    TIMSK2 = 0;   // disable the interrupt
-    *timer2_pin_port &= ~(timer2_pin_mask);  // keep pin low after stop
+    TIMSK2 &= ~(1 << OCIE2A);                 // disable the interrupt
+    *timer2_pin_port &= ~(timer2_pin_mask);   // keep pin low after stop
   }
   
   timer2_toggle_count = temp_toggle_count;
@@ -481,8 +473,8 @@ ISR(TIMER3_COMPA_vect)
   }
   else
   {
-    TIMSK3 = 0;   // disable the interrupt
-    *timer3_pin_port &= ~(timer3_pin_mask);  // keep pin low after stop
+    TIMSK3 &= ~(1 << OCIE3A);                 // disable the interrupt
+    *timer3_pin_port &= ~(timer3_pin_mask);   // keep pin low after stop
   }
 }
 
@@ -498,8 +490,8 @@ ISR(TIMER4_COMPA_vect)
   }
   else
   {
-    TIMSK4 = 0;   // disable the interrupt
-    *timer4_pin_port &= ~(timer4_pin_mask);  // keep pin low after stop
+    TIMSK4 &= ~(1 << OCIE4A);                 // disable the interrupt
+    *timer4_pin_port &= ~(timer4_pin_mask);   // keep pin low after stop
   }
 }
 
@@ -515,8 +507,8 @@ ISR(TIMER5_COMPA_vect)
   }
   else
   {
-    TIMSK5 = 0;   // disable the interrupt
-    *timer5_pin_port &= ~(timer5_pin_mask);  // keep pin low after stop
+    TIMSK5 &= ~(1 << OCIE5A);                 // disable the interrupt
+    *timer5_pin_port &= ~(timer5_pin_mask);   // keep pin low after stop
   }
 }
 
