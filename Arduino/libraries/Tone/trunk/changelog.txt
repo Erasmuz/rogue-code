@@ -14,4 +14,4 @@ Version Modified By Date     Comments
                     09/11/25 Fixed: Pin toggle method to XOR.
                     09/11/25 Fixed: timer0 from being excluded.
 0006    B Hagman    10/03/21 Fixed: License updates, minor fixes.
-0007    B Hagman    10/07/17 Fixed: (more) problems with ATmega8 (thanks to Pete62)
+        B Hagman    10/07/17 Fixed: (more) problems with ATmega8 (thanks to Pete62)
