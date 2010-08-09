@@ -48,7 +48,7 @@ class FIFO {
     int count() { return numberOfElements; }
 
   private:
-    int numberOfElements;
+    volatile int numberOfElements;
     int nextIn;
     int nextOut;
     T raw[rawSize];
@@ -65,24 +65,27 @@ bool FIFO<T,rawSize>::enqueue( T element )
 {
   if ( count() >= rawSize ) { return false; }
   numberOfElements++;
-  nextIn %= size;
   raw[nextIn] = element;
-  nextIn++; //advance to next index
+  if (++nextIn >= size) // advance to next index, wrap if needed
+    nextIn = 0;
   return true;
 }
 
 template<typename T, int rawSize>
 T FIFO<T,rawSize>::dequeue()
 {
+  T item;
   numberOfElements--;
-  nextOut %= size;
-  return raw[ nextOut++];
+  item = raw[nextOut];
+  if (++nextOut >= size) // advance to next index, wrap if needed
+    nextOut = 0;
+  return item;
 }
 
 template<typename T, int rawSize>
 T FIFO<T,rawSize>::peek() const
 {
-  return raw[ nextOut % size];
+  return raw[nextOut];
 }
 
 template<typename T, int rawSize>
