@@ -12,7 +12,6 @@
   Modifications:
     23 November 2006 by David A. Mellis
 
-
     This library is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -59,6 +58,15 @@ ISR(Serial1_RX_vect)
 {
   Serial1.rxfifo.enqueue(*Serial1._udr);
 }
+
+ISR(Serial1_TX_vect)
+{
+  if (Serial1.txfifo.count() > 0)
+    *Serial1._udr = Serial1.txfifo.dequeue();
+
+  if (Serial1.txfifo.count() == 0)
+    *Serial1._ucsrb = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
+}
 #endif
 
 #if SerialPorts > 2
@@ -66,12 +74,30 @@ ISR(Serial2_RX_vect)
 {
   Serial2.rxfifo.enqueue(*Serial2._udr);
 }
+
+ISR(Serial2_TX_vect)
+{
+  if (Serial2.txfifo.count() > 0)
+    *Serial2._udr = Serial2.txfifo.dequeue();
+
+  if (Serial2.txfifo.count() == 0)
+    *Serial2._ucsrb = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
+}
 #endif
 
 #if SerialPorts > 3
 ISR(Serial3_RX_vect)
 {
   Serial3.rxfifo.enqueue(*Serial3._udr);
+}
+
+ISR(Serial3_TX_vect)
+{
+  if (Serial3.txfifo.count() > 0)
+    *Serial3._udr = Serial3.txfifo.dequeue();
+
+  if (Serial3.txfifo.count() == 0)
+    *Serial3._ucsrb = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
 }
 #endif
 
@@ -166,8 +192,8 @@ void HardwareSerial::flush()
 
 void HardwareSerial::write(uint8_t c)
 {
-	// We will block here until we have some space free in the FIFO
-	while (txfifo.count() >= TX_BUFFER_SIZE);
+  // We will block here until we have some space free in the FIFO
+  while (txfifo.count() >= TX_BUFFER_SIZE);
 
   cli();
   txfifo.enqueue(c);
