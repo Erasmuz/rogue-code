@@ -1,227 +1,221 @@
-/*
-  HardwareSerial.cpp - Hardware serial library for Arduino
+/* $Id: HardwareSerial.cpp 106 2010-06-11 21:39:44Z bhagman@roguerobotics.com $
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+  Hardware Serial Library Class
+  Redesigned for RX and TX buffering using FIFO (by Alexander Brevig)
+  by Brett Hagman
+  http://www.roguerobotics.com/
+  bhagman@roguerobotics.com
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  Original Source:
+    HardwareSerial.cpp - Hardware serial library for Wiring - 2006 Nicholas Zambetti
+  Modifications:
+    23 November 2006 by David A. Mellis
 
+    This library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
 #include "HardwareSerial.h"
 
-// Some constants for the UARTS
+// Small fix for atmega8
+#if !defined(__AVR_ATmega8__)
 #define RXCIE RXCIE0
 #define UDRIE UDRIE0
-
 #define RXEN  RXEN0
 #define TXEN  TXEN0
-
 #define UDRE  UDRE0
+#define U2X   U2X0
+#endif
 
-
-
-// Define constants and variables for buffering incoming serial data.  We're
-// using a ring buffer, in which rx_buffer_head is the index of the
-// location to which to write the next incoming character and rx_buffer_tail
-// is the index of the location from which to read.
-#define RX_BUFFER_SIZE 32
-#define TX_BUFFER_SIZE 16
-
-struct _fifo {
-	uint8_t	idx_w;
-	uint8_t	idx_r;
-	uint8_t	count;
-	uint8_t *buff;
-};
-
-uint8_t _txbuff[TX_BUFFER_SIZE];
-uint8_t _txbuff1[TX_BUFFER_SIZE];
-uint8_t _rxbuff[RX_BUFFER_SIZE];
-uint8_t _rxbuff1[RX_BUFFER_SIZE];
-
-volatile _fifo __txfifo;
-volatile _fifo __txfifo1;
-volatile _fifo __rxfifo;
-volatile _fifo __rxfifo1;
-
-
-void __fifo_nq(unsigned char c, volatile _fifo *fifo, uint8_t buffersize)
+ISR(Serial_RX_vect)
 {
-	uint8_t n, i;
-
-	n = fifo->count;
-	if (n < buffersize)
-	{
-		fifo->count = ++n;
-		i = fifo->idx_w;
-		fifo->buff[i++] = c;
-		if (i >= buffersize)
-			i = 0;
-		fifo->idx_w = i;
-	}
+  Serial.rxfifo.enqueue(*Serial._udr);
 }
 
-// MUST check that fifo.count > 0 before calling this
-uint8_t __fifo_dq(volatile _fifo *fifo, uint8_t buffersize)
+ISR(Serial_TX_vect)
 {
-	uint8_t d = 0;
-	uint8_t i;
+  if (Serial.txfifo.count() > 0)
+    *Serial._udr = Serial.txfifo.dequeue();
 
-  i = fifo->idx_r;
-  d = fifo->buff[i++];
-  fifo->count--;
-  if (i >= buffersize)
-	  i = 0;
-  fifo->idx_r = i;
-
-	return d;
-}
-
-ISR(SIG_USART_RECV)
-{
-	unsigned char c = UDR0;
-  __fifo_nq(c, &__rxfifo, RX_BUFFER_SIZE);
+  if (Serial.txfifo.count() == 0)
+    *Serial._ucsrb = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
 }
 
 
-ISR(SIG_USART1_RECV)
+#if SerialPorts > 1
+ISR(Serial1_RX_vect)
 {
-	unsigned char c = UDR1;
-  __fifo_nq(c, &__rxfifo1, RX_BUFFER_SIZE);
+  Serial1.rxfifo.enqueue(*Serial1._udr);
 }
 
-
-/*
-ISR(SIG_USART_DATA)
+ISR(Serial1_TX_vect)
 {
-	uint8_t n, i;
+  if (Serial1.txfifo.count() > 0)
+    *Serial1._udr = Serial1.txfifo.dequeue();
 
-	n = __txfifo.count;
-	if (n > 0)
-	{
-		__txfifo.count = --n;
-		i = __txfifo.idx_r;
-		UDR0 = __txfifo.buff[i++];
-		if (i >= TX_BUFFER_SIZE)
-			i = 0;
-		__txfifo.idx_r = i;
-	}
-	if (n == 0)
-		UCSR0B &= (1 << UDRIE0);
+  if (Serial1.txfifo.count() == 0)
+    *Serial1._ucsrb = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
 }
-*/
+#endif
 
-ISR(SIG_USART_DATA)
+#if SerialPorts > 2
+ISR(Serial2_RX_vect)
 {
-  if (__txfifo.count > 0)
-    UDR0 = __fifo_dq(&__txfifo, TX_BUFFER_SIZE);
-
-  if (__txfifo.count == 0)
-    UCSR0B = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
+  Serial2.rxfifo.enqueue(*Serial2._udr);
 }
 
-
-
-ISR(SIG_USART1_DATA)
+ISR(Serial2_TX_vect)
 {
-  if (__txfifo1.count > 0)
-    UDR1 = __fifo_dq(&__txfifo1, TX_BUFFER_SIZE);
+  if (Serial2.txfifo.count() > 0)
+    *Serial2._udr = Serial2.txfifo.dequeue();
 
-  if (__txfifo1.count == 0)
-    UCSR1B = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
+  if (Serial2.txfifo.count() == 0)
+    *Serial2._ucsrb = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
+}
+#endif
+
+#if SerialPorts > 3
+ISR(Serial3_RX_vect)
+{
+  Serial3.rxfifo.enqueue(*Serial3._udr);
 }
 
+ISR(Serial3_TX_vect)
+{
+  if (Serial3.txfifo.count() > 0)
+    *Serial3._udr = Serial3.txfifo.dequeue();
 
-// Constructors ////////////////////////////////////////////////////////////////
+  if (Serial3.txfifo.count() == 0)
+    *Serial3._ucsrb = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
+}
+#endif
+
+
+// Constructor
 
 HardwareSerial::HardwareSerial(
-  volatile _fifo *rxfifo,
-  uint8_t *rxbuff,
-  volatile _fifo *txfifo,
-  uint8_t *txbuff,
   volatile uint16_t *ubrr,
   volatile uint8_t *ucsra,
   volatile uint8_t *ucsrb,
   volatile uint8_t *udr)
 {
-  _rxfifo = rxfifo;
-  _rxfifo->buff = rxbuff;
-  _txfifo = txfifo;
-  _txfifo->buff = txbuff;
   _ubrr = ubrr;
   _ucsra = ucsra;
   _ucsrb = ucsrb;
   _udr = udr;
 }
 
-// Public Methods //////////////////////////////////////////////////////////////
 
-void HardwareSerial::begin(long speed)
+// Public Methods
+
+void HardwareSerial::begin(long baud)
 {
-	*_ubrr = ((F_CPU / 16 + speed / 2) / speed - 1);
+  uint16_t baud_setting;
+  bool use_u2x;
+
+  // U2X mode is needed for baud rates higher than (CPU Hz / 16)
+  if (baud > F_CPU / 16) {
+    use_u2x = true;
+  } else {
+    // figure out if U2X mode would allow for a better connection
+    
+    // calculate the percent difference between the baud-rate specified and
+    // the real baud rate for both U2X and non-U2X mode (0-255 error percent)
+    uint8_t nonu2x_baud_error = abs((int)(255-((F_CPU/(16*(((F_CPU/8/baud-1)/2)+1))*255)/baud)));
+    uint8_t u2x_baud_error = abs((int)(255-((F_CPU/(8*(((F_CPU/4/baud-1)/2)+1))*255)/baud)));
+    
+    // prefer non-U2X mode because it handles clock skew better
+    use_u2x = (nonu2x_baud_error > u2x_baud_error);
+  }
+  
+  if (use_u2x) {
+    *_ucsra = 1 << U2X;
+    baud_setting = (F_CPU / 4 / baud - 1) / 2;
+  } else {
+    *_ucsra = 0;
+    baud_setting = (F_CPU / 8 / baud - 1) / 2;
+  }
+
+  // assign the baud_setting, a.k.a. ubbr (USART Baud Rate Register)
+
+	*_ubrr = baud_setting;
   *_ucsrb = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
 }
 
+
 void HardwareSerial::end()
 {
-  *_ucsrb &= ~((1 << RXEN) | (1 << TXEN) | (1 << RXCIE));
+  *_ucsrb &= ~(1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
 }
 
-uint8_t HardwareSerial::available(void)
+
+int HardwareSerial::available(void)
 {
-  return _rxfifo->count;
+  return rxfifo.count();
 }
+
 
 int HardwareSerial::read(void)
 {
-  if (_rxfifo->count > 0)
-    return (int) __fifo_dq(_rxfifo, RX_BUFFER_SIZE);
+  if (rxfifo.count())
+    return rxfifo.dequeue();
   else
     return -1;
 }
+
 
 int HardwareSerial::peek(void)
 {
-  if (_rxfifo->count > 0)
-    return (int) _rxfifo->buff[_rxfifo->idx_r];
+  if (rxfifo.count())
+    return rxfifo.peek();
   else
     return -1;
 }
 
+
 void HardwareSerial::flush()
 {
-  cli();
-  _rxfifo->idx_r = _rxfifo->idx_w = 0;
-  sei();
+  rxfifo.flush();
 }
+
 
 void HardwareSerial::write(uint8_t c)
 {
-	uint8_t i;
-
-	// We will block here until we have some space free in the FIFO
-	while(_txfifo->count >= TX_BUFFER_SIZE);
+  // We will block here until we have some space free in the FIFO
+  while (txfifo.count() >= TX_BUFFER_SIZE);
 
   cli();
-  __fifo_nq(c, _txfifo, TX_BUFFER_SIZE);
+  txfifo.enqueue(c);
   *_ucsrb |= (1 << UDRIE);
   sei();
 }
 
 
-// Preinstantiate Objects //////////////////////////////////////////////////////
+// Preinstantiate Objects
 
-HardwareSerial Serial(&__rxfifo, _rxbuff, &__txfifo, _txbuff, &UBRR0, &UCSR0A, &UCSR0B, &UDR0);
-HardwareSerial Serial1(&__rxfifo1, _rxbuff1, &__txfifo1, _txbuff1, &UBRR1, &UCSR1A, &UCSR1B, &UDR1);
+#if defined(__AVR_ATmega8__)
+HardwareSerial Serial(&UBRR, &UCSRA, &UCSRB, &UDR);
+#else
+HardwareSerial Serial(&UBRR0, &UCSR0A, &UCSR0B, &UDR0);
+#endif
+
+#if SerialPorts > 1
+HardwareSerial Serial1(&UBRR1, &UCSR1A, &UCSR1B, &UDR1);
+#endif
+#if SerialPorts > 2
+HardwareSerial Serial2(&UBRR2, &UCSR2A, &UCSR2B, &UDR2);
+#endif
+#if SerialPorts > 3
+HardwareSerial Serial3(&UBRR3, &UCSR3A, &UCSR3B, &UDR3);
+#endif
