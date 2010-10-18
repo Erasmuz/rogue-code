@@ -30,15 +30,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Version Modified By Date     Comments
-------- ----------- -------- --------
-0001    B Hagman    09/07/05 Initial coding
-
 *************************************************/
 
 #include <stdint.h>
-#include <wiring.h>
 #include <ctype.h>
+#include <util/delay.h>
 #include "RogueMP3.h"
 
 /*************************************************
@@ -70,7 +66,7 @@ RogueMP3::RogueMP3(int8_t (*_af)(void), int (*_pf)(void), int (*_rf)(void), void
 }
 */
 
-RogueMP3::RogueMP3(SerialBase &comms)
+RogueMP3::RogueMP3(Stream &comms)
 : LastErrorCode(0),
   _promptchar(DEFAULT_PROMPT),
   _fwversion(0),
@@ -300,7 +296,7 @@ void RogueMP3::fade_lr(uint8_t new_vleft, uint8_t new_vright, uint16_t fadems)
       vleft += il;
       vright += ir;
       setvolume(vleft/16, vright/16);
-      delay(fadetimestep);
+      _delay_ms(fadetimestep);
     }
   }
 }
