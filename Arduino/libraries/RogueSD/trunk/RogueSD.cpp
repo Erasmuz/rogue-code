@@ -35,8 +35,8 @@
 *************************************************/
 
 #include <stdint.h>
-#include <wiring.h>
 #include <ctype.h>
+#include <util/delay.h>
 #include "RogueSD.h"
 
 /*************************************************
@@ -54,7 +54,7 @@
 * Constructor
 *************************************************/
 
-/*
+/* Old constructor without abstract base class.
 RogueSD::RogueSD(int8_t (*_af)(void), int (*_pf)(void), int (*_rf)(void), void (*_wf)(uint8_t))
 : LastErrorCode(0),
   _promptchar(DEFAULT_PROMPT),
@@ -67,7 +67,8 @@ RogueSD::RogueSD(int8_t (*_af)(void), int (*_pf)(void), int (*_rf)(void), void (
   _writef = _wf;
 }
 */
-RogueSD::RogueSD(SerialBase &comms)
+
+RogueSD::RogueSD(Stream &comms)
 : LastErrorCode(0),
   _promptchar(DEFAULT_PROMPT),
   _fwversion(0),
@@ -97,7 +98,6 @@ int8_t RogueSD::sync(void)
   _read_blocked();                      // consume prompt
 
   // 2. get version (ignore prompt - just drop it)
-  
   _get_version();
 
   // 3. change settings as needed
@@ -744,7 +744,7 @@ int8_t RogueSD::writeln_finish(void)
   {
     // old
     // we wait for more than 10ms to terminate the Write command (write time-out)
-    delay(11);
+    _delay_ms(11);
   }
   else
   {

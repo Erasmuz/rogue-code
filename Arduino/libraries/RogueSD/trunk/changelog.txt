@@ -13,3 +13,6 @@ Version Modified By Date     Comments
                              Added writebyte() - write single byte
                              Added getfilesize()
                              Added entrytofilename() - gets filename from a path filter entry
+0004    B Hagman    10/08/10 Updated to new Stream class proposed for Arduino 0019
+                             Fixed dependency on Arduino core - now works with Wiring as well
+

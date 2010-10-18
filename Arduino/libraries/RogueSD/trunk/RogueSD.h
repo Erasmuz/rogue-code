@@ -32,11 +32,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Version Modified By Date     Comments
-------- ----------- -------- --------
-0001    B Hagman    09/06/21 Initial coding
-0002    B Hagman    09/12/18 Fixed filecount()
-
 *************************************************/
 
 #ifndef _RogueSD_h
@@ -44,8 +39,8 @@ Version Modified By Date     Comments
 
 #include <avr/pgmspace.h>
 #include <stdint.h>
-#include <Print.h>
-#include <SerialBase.h>
+#include <Stream.h>
+// The Stream class is derived from the Print class
 
 /*************************************************
 * Public Constants
@@ -112,7 +107,7 @@ class RogueSD : public Print
 
     // constructor
 //    RogueSD(int8_t (*_af)(void), int16_t (*_pf)(void), int16_t (*_rf)(void), void (*_wf)(uint8_t));
-    RogueSD(SerialBase &comms);
+    RogueSD(Stream &comms);
 
     int8_t sync(void);
 
@@ -195,7 +190,7 @@ class RogueSD : public Print
     // Polymorphism used to interact with serial class
     // SerialBase is an abstract base class which defines a base set
     // of functionality for serial classes.
-    SerialBase *_comms;
+    Stream *_comms;
 
     uint8_t _promptchar;
     int16_t _fwversion;
