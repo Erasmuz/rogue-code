@@ -22,10 +22,12 @@ Be sure to try out the RTTTL (!RingTone Text Transfer Language) example!
 
 A simplified version of the Tone library has been incorporated into the Arduino core since 0018.  It only provides a single tone (since only one timer is used).  You can find the core documentation [http://arduino.cc/en/Reference/Tone here].
 
-Check out the great [http://itp.nyu.edu/physcomp/Labs/ToneOutput tutorial] by Tom Igoe at NYU's Interactive Telecommunications Program (ITP).  It demonstrates how to use the core `tone()` and `noTone()` commands.
+Check out the [http://itp.nyu.edu/physcomp/Labs/ToneOutput tutorial] by Tom Igoe at NYU's Interactive Telecommunications Program (ITP).  It demonstrates how to use the core `tone()` and `noTone()` commands.
 
 === _WARNING_ ===
 *_Do not connect the pin directly to some sort of audio input.  The voltage is considerably higher than a standard [http://en.wikipedia.org/wiki/Line_level line level voltages], and can damage sound card inputs, etc.  You could use a voltage divider to bring the voltage down, but you have been warned._*
+
+*_You MUST have a resistor in line with the speaker, or you WILL damage your controller._*
 
 ----
 
@@ -39,9 +41,15 @@ For installing the library, see: InstallingArduinoLibraries
 
 == Hardware Connections/Requirements ==
 
-  * Just connect the digital pin to a speaker (with a resistor - say 1K - in line), and the other side of the speaker to ground (GND).  Tom Igoe's example:
+  * Just connect the digital pin to a speaker (with a resistor - say 1K - in line), and the other side of the speaker to ground (GND).
 
-[http://arduino.cc/en/uploads/Tutorial/speaker_schem.png]
+<table border="0"><tr><td>
+<a href="http://www.flickr.com/photos/roguerobotics/5579703277/" title="Tone-Arduino-Connections by Rogue Robotics, on Flickr"><img src="http://farm6.static.flickr.com/5295/5579703277_3ed8d18103.jpg" width="322" height="470" alt="Tone-Arduino-Connections" />
+</a></td>
+<td>
+<a href="http://www.flickr.com/photos/roguerobotics/5579703257/" title="Tone-Wiring-Connections by Rogue Robotics, on Flickr"><img src="http://farm6.static.flickr.com/5293/5579703257_9b8feb5db5.jpg" width="393" height="490" alt="Tone-Wiring-Connections" /></a></td>
+</tr>
+</table>
 
   * You can use a potentiometer to control the volume.  Use a 10K Ohm potentiometer (variable resistor) in line with the 1K Ohm resistor connected to the speaker.
 
