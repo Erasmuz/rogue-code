@@ -27,8 +27,7 @@
 #include <avr/interrupt.h>
 #include "SoftPWM.h"
 #include "SoftPWM_timer.h"
-#include <wiring.h>
-#include <pins_arduino.h>
+#include <WProgram.h>
 
 #if F_CPU
 #define SOFTPWM_FREQ 60UL
@@ -39,11 +38,13 @@
 #endif
 
 volatile uint8_t _isr_softcount = 0xff;
+uint8_t _softpwm_defaultPolarity = SOFTPWM_NORMAL;
 
 typedef struct
 {
   // hardware I/O port and pin for this channel
   int8_t pin;
+  uint8_t polarity;
   volatile uint8_t *outport;
   uint8_t pinmask;
   uint8_t pwmvalue;
@@ -56,7 +57,11 @@ softPWMChannel _softpwm_channels[SOFTPWM_MAXCHANNELS];
 
 
 // Here is the meat and gravy
+#ifdef WIRING
+void SoftPWM_Timer_Interrupt(void)
+#else
 ISR(SOFTPWM_TIMER_INTERRUPT)
+#endif
 {
   uint8_t i;
   int16_t newvalue;
@@ -96,7 +101,12 @@ ISR(SOFTPWM_TIMER_INTERRUPT)
 
       // now set the pin high (if not 0)
       if (_softpwm_channels[i].checkval > 0)  // don't set if checkval == 0
-        *_softpwm_channels[i].outport |= _softpwm_channels[i].pinmask;
+      {
+        if (_softpwm_channels[i].polarity == SOFTPWM_NORMAL)
+          *_softpwm_channels[i].outport |= _softpwm_channels[i].pinmask;
+        else
+          *_softpwm_channels[i].outport &= ~(_softpwm_channels[i].pinmask);
+      }
 
     }
   }
@@ -104,14 +114,22 @@ ISR(SOFTPWM_TIMER_INTERRUPT)
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
   {
     if (_softpwm_channels[i].pin >= 0)  // if it's a valid pin
+    {
       if (_softpwm_channels[i].checkval == _isr_softcount)  // if we have hit the width
-        *_softpwm_channels[i].outport &= ~(_softpwm_channels[i].pinmask);  // turn off the channel
+      {
+        // turn off the channel
+        if (_softpwm_channels[i].polarity == SOFTPWM_NORMAL)
+          *_softpwm_channels[i].outport &= ~(_softpwm_channels[i].pinmask);
+        else
+          *_softpwm_channels[i].outport |= _softpwm_channels[i].pinmask;
+      }
+    }
   }  
 }
 
 
 
-void SoftPWMBegin(void)
+void SoftPWMBegin(uint8_t defaultPolarity)
 {
   // We can tweak the number of PWM period by changing the prescalar
   // and the OCR - we'll default to ck/8 (CS21 set) and OCR=128.
@@ -122,14 +140,44 @@ void SoftPWMBegin(void)
 
   uint8_t i;
 
+#ifdef WIRING
+  Timer2.setMode(0b010);  // CTC
+  Timer2.setClockSource(CLOCK_PRESCALE_8);
+  Timer2.setOCR(CHANNEL_A, SOFTPWM_OCR);
+  Timer2.attachInterrupt(INTERRUPT_COMPARE_MATCH_A, SoftPWM_Timer_Interrupt);
+#else
   SOFTPWM_TIMER_INIT(SOFTPWM_OCR);
+#endif
+
+
 
   for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
   {
     _softpwm_channels[i].pin = -1;
+    _softpwm_channels[i].polarity = SOFTPWM_NORMAL;
     _softpwm_channels[i].outport = 0;
     _softpwm_channels[i].fadeuprate = 0;
     _softpwm_channels[i].fadedownrate = 0;
+  }
+
+  _softpwm_defaultPolarity = defaultPolarity;
+}
+
+
+void SoftPWMSetPolarity(int8_t pin, uint8_t polarity)
+{
+  uint8_t i;
+
+  if (polarity != SOFTPWM_NORMAL)
+    polarity = SOFTPWM_INVERTED;
+
+  for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
+  {
+    if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+       (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
+    {
+      _softpwm_channels[i].polarity = polarity;
+    }
   }
 }
 
@@ -173,13 +221,18 @@ void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset)
   {
     // we have a free pin we can use
     _softpwm_channels[firstfree].pin = pin;
+    _softpwm_channels[firstfree].polarity = _softpwm_defaultPolarity;
     _softpwm_channels[firstfree].outport = portOutputRegister(digitalPinToPort(pin));
     _softpwm_channels[firstfree].pinmask = digitalPinToBitMask(pin);
     _softpwm_channels[firstfree].pwmvalue = value;
 //    _softpwm_channels[firstfree].checkval = 0;
     
     // now prepare the pin for output
-    digitalWrite(pin, 0);  // turn it off to start (no glitch)
+    // turn it off to start (no glitch)
+    if (_softpwm_defaultPolarity == SOFTPWM_NORMAL)
+      digitalWrite(pin, LOW);
+    else
+      digitalWrite(pin, HIGH);
     pinMode(pin, OUTPUT);
   }
 }

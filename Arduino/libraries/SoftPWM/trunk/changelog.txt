@@ -8,3 +8,5 @@ Version Modified By Date     Comments
 0002    B Hagman    10/03/21 License updates, minor fixes
 0003    B Hagman    10/04/21 Added hardset control for syncing to matrix scan lines
 0004    B Hagman    10/06/27 Fixed: pin 0 could not be used.
+0005    B Hagman    11/05/27 Added polarity, and full Wiring support
+

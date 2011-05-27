@@ -21,15 +21,25 @@
 
 *************************************************/
 
+#ifndef SOFTPWM_H
+#define SOFTPWM_H
+
 #include <stdint.h>
 
 #define SOFTPWM_MAXCHANNELS 20
 #define SOFTPWM_PWMDEFAULT 0x00
 
+#define SOFTPWM_NORMAL 0
+#define SOFTPWM_INVERTED 1
+
 #define ALL -1
 
-void SoftPWMBegin(void);
+void SoftPWMBegin(uint8_t defaultPolarity = SOFTPWM_NORMAL);
 void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset = 0);
 void SoftPWMSetPercent(int8_t pin, uint8_t percent, uint8_t hardset = 0);
 void SoftPWMEnd(int8_t pin);
 void SoftPWMSetFadeTime(int8_t pin, uint16_t fadeUpTime, uint16_t fadeDownTime);
+void SoftPWMSetPolarity(int8_t pin, uint8_t polarity);
+
+#endif
+
