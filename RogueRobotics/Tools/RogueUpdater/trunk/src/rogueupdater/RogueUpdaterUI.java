@@ -56,6 +56,7 @@ public class RogueUpdaterUI extends javax.swing.JFrame
         buttonRefresh = new javax.swing.JButton();
         labelLogo = new javax.swing.JLabel();
         labelTitle = new javax.swing.JLabel();
+        labelVersion = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Rogue Updater");
@@ -118,6 +119,9 @@ public class RogueUpdaterUI extends javax.swing.JFrame
         labelTitle.setText("Firmware Update Tool");
         labelTitle.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
+        labelVersion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        labelVersion.setText("V0002");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -145,6 +149,10 @@ public class RogueUpdaterUI extends javax.swing.JFrame
                             .addComponent(buttonRefresh))))
                 .addContainerGap())
             .addComponent(labelTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(150, 150, 150)
+                .addComponent(labelVersion, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)
+                .addGap(150, 150, 150))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -169,7 +177,8 @@ public class RogueUpdaterUI extends javax.swing.JFrame
                     .addComponent(buttonUpload))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(progressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelVersion))
         );
 
         pack();
@@ -241,6 +250,19 @@ public class RogueUpdaterUI extends javax.swing.JFrame
         // open the port
         openSerialPort();
 
+/*
+        try { Thread.sleep(2000L); }
+        catch (Exception e) { }
+
+        try {
+            while (input.available() > 0)
+            {
+                byte x = (byte) input.read();
+                System.out.printf("Dumped: %02x\n", x);
+            }
+        }
+        catch (Exception e) { }
+*/
         // send the data
         int index = 0;
         int frameSize = 0;
@@ -287,6 +309,7 @@ public class RogueUpdaterUI extends javax.swing.JFrame
                                 "Timeout waiting for response. Update failed.",
                                 "Update Error",
                                 null);
+                        closeSerialPort();
                         return;
                     }
                 }
@@ -303,7 +326,7 @@ public class RogueUpdaterUI extends javax.swing.JFrame
                         retries++;
                         if (retries > 4)
                         {
-                            errorMessage("CRC error. File damaged.", "Update Error", null);
+                            errorMessage("Cannot communicate with module. Is it in Update mode?", "Update Error", null);
                             closeSerialPort();
                             return;
                         }
@@ -317,7 +340,7 @@ public class RogueUpdaterUI extends javax.swing.JFrame
             }
             catch (Exception ex)
             {
-                errorMessage("Upload Error", "Error", ex);
+                errorMessage("Upload Error. Maybe something got disconnected?", "Error", ex);
                 break;
             }
         }
@@ -486,6 +509,7 @@ public class RogueUpdaterUI extends javax.swing.JFrame
     private javax.swing.JLabel labelLogo;
     private javax.swing.JLabel labelSerialPort;
     private javax.swing.JLabel labelTitle;
+    private javax.swing.JLabel labelVersion;
     private javax.swing.JProgressBar progressBar1;
     private javax.swing.JTextField textFile;
     // End of variables declaration//GEN-END:variables
