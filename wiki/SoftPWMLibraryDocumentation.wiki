@@ -1,6 +1,6 @@
-#summary Arduino SoftPWM Library.
+#summary Arduino/Wiring SoftPWM Library.
 
-=Arduino SoftPWM Library=
+=Arduino/Wiring SoftPWM Library=
 
 ----
 
@@ -18,7 +18,7 @@ See: InstallingArduinoLibraries
 
 ==Description==
 
-An Arduino Library to produce PWM signals on any arbitrary pin.
+An Arduino and Wiring Library to produce PWM signals on any arbitrary pin.
 
 It was originally designed for use controlling the brightness of LEDs, but could be modified to control servos and other low frequency PWM controlled devices as well.
 
