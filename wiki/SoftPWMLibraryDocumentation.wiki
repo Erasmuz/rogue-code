@@ -8,9 +8,17 @@
 
 ----
 
+==What's New?==
+
+Version 0005:
+
+  * Fixed Arduino 1.0 mess.
+  * Added Polarity control.
+  * Up to 20 channels can be defined.
+
 ==Download==
 
-* [http://rogue-code.googlecode.com/files/Arduino-Library-SoftPWM.zip SoftPWM Library - Latest Version]
+* [http://rogue-code.googlecode.com/files/Wiring-Library-SoftPWM-V0005.zip SoftPWM Library - Latest Version]
 
 ==Installation==
 
@@ -73,8 +81,10 @@ void loop()
 
 ==Function Descriptions==
 
-`SoftPWMBegin()`
+`SoftPWMBegin([`_*`defaultPolarity`*_`])`
   * Initializes the library - sets up the timer and other tasks.
+  * optional _*`defaultPolarity`*_ allows all newly defined pins to take on this polarity.
+    * Values: *`SOFTPWM_NORMAL`*, *`SOFTPWM_INVERTED`*
 
 `SoftPWMSet(`_*`pin`*_`, `_*`value`*_`)`
   * _*`pin`*_ is the output pin.
@@ -91,10 +101,16 @@ void loop()
   * _*`fadedowntime`*_ is the time in milliseconds that it will take the channel to fade from 255 to 0.
     * Range: 0 to 4000
 
+`SoftPWMSetPolarity(`_*`pin`*_`, `_*`polarity`*_`)`
+  * _*`pin`*_ is the output pin.
+  * _*`polarity`*_ is the polarity for the given pin.
+
 ===Notes===
 
   * You can use `ALL` in place of the pin number to have the function act on all currently set channels.
     * e.g. `SoftPWMSetFadeTime(ALL, 100, 400)` - this will set all created channels to have a fade-up time of 100 ms and a fade-down time of 400.
+  * The polarity setting of the pin is as follows:
+    * *`SOFTPWM_NORMAL`* means that the pin LOW when the PWM value is 0, whereas *`SOFTPWM_INVERTED`* indicates the pin should be HIGH when the PWM value is 0.
 
 ==Demonstrations==
 
