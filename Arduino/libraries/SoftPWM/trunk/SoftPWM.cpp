@@ -27,7 +27,14 @@
 #include <avr/interrupt.h>
 #include "SoftPWM.h"
 #include "SoftPWM_timer.h"
-#include <WProgram.h>
+
+#if defined(WIRING)
+ #include <Wiring.h>
+#elif ARDUINO >= 100
+ #include <Arduino.h>
+#else
+ #include <WProgram.h>
+#endif
 
 #if F_CPU
 #define SOFTPWM_FREQ 60UL
