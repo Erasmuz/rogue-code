@@ -30,12 +30,12 @@ An Arduino and Wiring Library to produce PWM signals on any arbitrary pin.
 
 It was originally designed for use controlling the brightness of LEDs, but could be modified to control servos and other low frequency PWM controlled devices as well.
 
-It uses a single hardware timer (Timer 2) on the microcontroller to generate up to 16 PWM channels.
+It uses a single hardware timer (Timer 2) on the microcontroller to generate up to 20 PWM channels.
 
 ==Features==
 
   * Arbitrary output pins.
-  * Up to 16 different channels can be created.
+  * Up to 20 different channels can be created.
   * True zero level, i.e. off = off
   * Separate fade rates for on and off.
 
