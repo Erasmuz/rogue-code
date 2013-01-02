@@ -25,6 +25,6 @@ http://code.google.com/p/rogue-code/issues/list?can=2&q=label%3AProject-uMP3Firm
 
 = Documentation =
 
-Rogue Robotics *uMMC Serial Data Module* documentation can be found here:
+Rogue Robotics *uMP3 Playback Module* documentation can be found here:
 
 http://www.roguerobotics.com/wikidocs/ump3/documentation/
