@@ -1,5 +1,4 @@
 #summary uMP3 Firmware Status
-#labels Phase-Implementation
 
 = uMP3 Firmware Status =
 
